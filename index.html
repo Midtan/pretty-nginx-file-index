@@ -90,10 +90,10 @@
                     var icon = getIconString(entry);
                     entry.name = entry.size && entry.name || entry.name + '/';
                     $("#filelist-body").append("<tr><td class='td-file-name'><a href=\"{0}/{1}\">{2} {3}</a></td><td class='td-file-size'>{4}</td><td class='td-file-date'>{5}</td></tr>".format(
-                        window.location.href.replace(/\/$/, ""),
-                        encodeURIComponent(entry.name),
+						decodeURIComponent(window.location.href.replace(/\/$/, "")),
+						encodeURIComponent(entry.name).replace('%2F', '/'),
                         iconString.format(icon),
-                        entry.name,
+                        escape_HTML(entry.name),
                         entry.size ? formatBytes(entry.size, 2) : '-',
                         entry.mtime
                     ));
@@ -125,6 +125,22 @@
                 i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
         };
+        
+        function escape_HTML(html_str) {
+            'use strict';
+
+            return html_str.replace(/[&<>"]/g, function (tag) {
+                var chars_to_replace = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+
+                return chars_to_replace[tag] || tag;
+            });
+        }
 
         String.prototype.format = function () {
             var args = arguments;
