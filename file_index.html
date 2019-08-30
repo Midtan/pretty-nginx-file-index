@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.6/css/all.css">
+
+    <style>
+        body {
+            font-size: 16px;
+        }
+
+        .fileicon {
+            color: #646464;
+        }
+
+        .td-file-name {
+            white-space: nowrap;
+            min-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .td-file-size {
+            width: 130px;
+        }
+
+        .td-file-date {
+            width: 270px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="filelist-container" class="container-fluid">
+    <h1 id="headerline">Index of </h1>
+    <table class="table table-condensed table-striped table-hover">
+        <thead>
+        <tr>
+            <th class="td-file-name">File Name</th>
+            <th class="td-file-size">File Size</th>
+            <th class="td-file-date">Date</th>
+        </tr>
+        </thead>
+        <tbody id="filelist-body">
+
+        </tbody>
+    </table>
+</div>
+<script>
+    const iconObject = {
+        "far fa-file-archive": ["rar", "zip", "7z", "gz", "bz2", "tgz", "tbz2", "tar"],
+        "far fa-file-video": ["mkv", "mp4", "webm", "avi", "m4v", "h264", "mpg", "m2v", "mpeg", "ts", "m2ts", "vob", "mov"],
+        "far fa-file-audio": ["mka", "mp3", "aac", "ac3", "m4a", "flac", "pcm", "wav", "wma"],
+        "far fa-file-text": ["txt", "log", "mks", "ass", "ssa", "srt"],
+        "far fa-file-image": ["png", "jpg", "jpeg", "bmp", "gif", "ico", "svg", "tiff", "tif"],
+        "far fa-file-code": ["php", "html", "htm", "js", "ts", "css", "avs", "vpy", "bat", "sh", "xml", "ini", "json", "py", "cpp", "c", "hpp", "h"],
+        "far fa-file-pdf": ["pdf"]
+    };
+
+    const folderIcon = "fas fa-folder";
+    const defaultIcon = "far fa-file";
+
+    const iconString = "<span class='fileicon {0}'></span>";
+
+    function update(){
+        const headline = document.getElementById("headerline");
+        headline.innerHTML = "Index of " + decodeURIComponent(window.location.pathname);
+        fetch("/list" + window.location.pathname)
+            .then(async function(resp){
+                const body = document.getElementById("filelist-body");
+                document.getElementsByTagName("table")[0].style.display = 'block';
+                body.innerHTML = "";
+                body.insertAdjacentHTML("beforeend", "<tr><td><a href='../' onclick=\"on_click_link(this); return false;\">../</a></td><td></td><td></td></tr>");
+                const text = await resp.text();
+                if(text.length === 0)
+                    return;
+
+                if(resp.status !== 200){
+                    throw resp.status + " " + resp.statusText;
+                }
+
+                data = JSON.parse(text);
+                for(let entry in data){
+                    entry = data[entry];
+                    const icon = getIconString(entry);
+                    if(entry.type === "directory")
+                        entry.name += "/";
+                    body.insertAdjacentHTML("beforeend", "<tr><td class='td-file-name'><a href=\"{0}/{1}\" onclick=\"on_click_link(this); return false;\">{2} {3}</a></td><td class='td-file-size'>{4}</td><td class='td-file-date'>{5}</td></tr>".format(
+                        decodeURIComponent(window.location.href.replace(/\/$/, "")),
+                        encodeURIComponent(entry.name).replace('%2F', '/'),
+                        iconString.format(icon),
+                        escape_HTML(entry.name),
+                        entry.size ? formatBytes(entry.size, 2) : '-',
+                        entry.mtime
+                    ));
+                }
+            })
+            .catch(function(err){
+                document.getElementsByTagName("table")[0].style.display = 'none';
+                headline.innerHTML = "<h1 style=\"color: red\"><a href=\".\" onclick=\"history.back(); return false;\" style=\"text-decoration: none; color: gray; padding-right: 15px\"><i class=\"fas fa-chevron-left\"></i></a>" + err + "</h1>";
+            });
+    }
+
+    function on_click_link(ele){
+        history.pushState({}, "", ele.pathname);
+        update();
+    }
+
+    window.onpopstate = function(_){
+        update();
+    };
+
+    document.addEventListener("DOMContentLoaded", update, false);
+
+    function getIconString(entry) {
+        if (entry.type === "directory") {
+            return folderIcon;
+        }
+        const ext = entry.name.split(".").pop().toLowerCase();
+        for (const iconKey in iconObject) {
+            if (iconObject[iconKey].indexOf(ext) !== -1) {
+                return iconKey;
+            }
+        }
+        return defaultIcon;
+    }
+
+    function formatBytes(bytes, decimals) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024,
+            dm = decimals || 2,
+            sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'],
+            i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    function escape_HTML(html_str) {
+        'use strict';
+
+        return html_str.replace(/[&<>"]/g, function (tag) {
+            const chars_repl = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+
+            return chars_repl[tag] || tag;
+        });
+    }
+
+    String.prototype.format = function () {
+        const args = arguments;
+        return this.replace(/{(\d+)}/g, function (match, number) {
+            return typeof args[number] != 'undefined'
+                ? args[number]
+                : match
+                ;
+        });
+    };
+</script>
+</body>
+</html>
