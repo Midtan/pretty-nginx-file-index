@@ -21,7 +21,6 @@
 
         .td-file-name {
             white-space: nowrap;
-            min-width: 300px;
             overflow: hidden;
             text-overflow: ellipsis;
         }
@@ -74,7 +73,7 @@
         fetch("/list" + window.location.pathname)
             .then(async function(resp){
                 const body = document.getElementById("filelist-body");
-                document.getElementsByTagName("table")[0].style.display = 'block';
+                document.getElementsByTagName("table")[0].style.display = 'table';
                 body.innerHTML = "";
                 body.insertAdjacentHTML("beforeend", "<tr><td><a href='../' onclick=\"on_click_link(this); return false;\">../</a></td><td></td><td></td></tr>");
                 const text = await resp.text();
