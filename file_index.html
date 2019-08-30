@@ -85,19 +85,23 @@
                     throw resp.status + " " + resp.statusText;
                 }
 
-                data = JSON.parse(text);
+                const data = JSON.parse(text);
                 for(let entry in data){
                     entry = data[entry];
                     const icon = getIconString(entry);
-                    if(entry.type === "directory")
+                    let onclick_str = "";
+                    if(entry.type === "directory"){
                         entry.name += "/";
-                    body.insertAdjacentHTML("beforeend", "<tr><td class='td-file-name'><a href=\"{0}/{1}\" onclick=\"on_click_link(this); return false;\">{2} {3}</a></td><td class='td-file-size'>{4}</td><td class='td-file-date'>{5}</td></tr>".format(
+                        onclick_str = " onclick=\"on_click_link(this); return false;\"";
+                    }
+                    body.insertAdjacentHTML("beforeend", "<tr><td class='td-file-name'><a href=\"{0}/{1}\"{6}>{2} {3}</a></td><td class='td-file-size'>{4}</td><td class='td-file-date'>{5}</td></tr>".format(
                         decodeURIComponent(window.location.href.replace(/\/$/, "")),
                         encodeURIComponent(entry.name).replace('%2F', '/'),
                         iconString.format(icon),
                         escape_HTML(entry.name),
                         entry.size ? formatBytes(entry.size, 2) : '-',
-                        entry.mtime
+                        entry.mtime,
+                        onclick_str
                     ));
                 }
             })
