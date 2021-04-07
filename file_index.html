@@ -32,12 +32,26 @@
         .td-file-date {
             width: 270px;
         }
+
+        .dl-textarea {
+            min-width: 569px;
+            white-space: pre;
+            overflow: auto;
+        }
+
+        .modal-dialog {
+            display: table;
+        }
     </style>
 </head>
 
 <body>
 <div id="filelist-container" class="container-fluid">
     <h1 id="headerline">Index of </h1>
+    <button type="button" class="btn" onclick="openModal()">
+        <i class="fas fa-download"></i>
+        &nbsp;Download All
+    </button>
     <table class="table table-condensed table-striped table-hover">
         <thead>
         <tr>
@@ -51,6 +65,42 @@
         </tbody>
     </table>
 </div>
+
+<div class="modal fade" id="download-modal" aria-labelledby="download-modal-label" aria-modal="true"
+     role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" aria-label="Close" onclick="closeModal()">&times;</button>
+                <h4 class="modal-title" id="download-modal-label"><i class="fas fa-download"></i>&nbsp;Download All</h4>
+            </div>
+            <div class="modal-body">
+                <div class="btn-croup btn-group-sm" style="float: right;/** God, I hate css**/">
+                    <button type="button" id="copy-downloads-button" class="btn btn-default"><i class="far fa-clipboard"></i>&nbsp;Copy To Clipboard</button>
+                </div>
+
+                <div class="download-links-container form-group">
+                    <textarea id="download-links" class="form-control dl-textarea" rows="15" readonly></textarea>
+                </div>
+
+                <div class="download-links-template-container form-group">
+                    <label for="download-links-template">Template</label>
+                    <div class="btn-group btn-group-sm" style="float: right;/** God, I hate css**/">
+                        <button type="button" class="btn btn-default" onclick="changeTemplate('raw')">raw</button>
+                        <button type="button" class="btn btn-default" onclick="changeTemplate('curl')">cURL</button>
+                        <button type="button" class="btn btn-default" onclick="changeTemplate('wget')">wget</button>
+                    </div>
+                    <input type="text" id="download-links-template" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-backdrop fade" id="backdrop" style="display: none;"></div>
+
 <script>
     const iconObject = {
         "far fa-file-archive": ["rar", "zip", "7z", "gz", "bz2", "tgz", "tbz2", "tar"],
@@ -66,6 +116,18 @@
     const defaultIcon = "far fa-file";
 
     const iconString = "<span class='fileicon {0}'></span>";
+
+    const dlTemplates = {raw: "{0}", curl: "curl '{0}' > '{1}'", wget: "wget '{0}'"}
+    document.getElementById("download-links-template").addEventListener("keyup", function() {
+        fillDownloadLinks();
+    });
+
+    document.getElementById("copy-downloads-button").addEventListener("click", function () {
+        document.getElementById("download-links").select();
+        document.execCommand("copy");
+    });
+
+    let data = {};
 
     function update(){
         const headline = document.getElementById("headerline");
@@ -84,7 +146,7 @@
                     throw resp.status + " " + resp.statusText;
                 }
 
-                const data = JSON.parse(text);
+                data = JSON.parse(text);
                 for(let entry in data){
                     entry = data[entry];
                     const icon = getIconString(entry);
@@ -143,6 +205,30 @@
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     }
 
+    function changeTemplate(template) {
+        document.getElementById("download-links-template").value = dlTemplates[template];
+        fillDownloadLinks();
+    }
+
+    function fillDownloadLinks() {
+        const template = document.getElementById("download-links-template").value;
+        const textField = document.getElementById("download-links");
+        textField.value = "";
+        const linkTemplate = "{0}/{1}"
+        for(let entry in data){
+            entry = data[entry];
+            if(entry.type === "directory"){
+                continue;
+            }
+            let link = linkTemplate.format(
+                window.location.href.replace(/\/$/, ""),
+                encodeURIComponent(entry.name.replace('%2F', '/'))
+            );
+            textField.value += template.format(link, entry.name.replace('%2F', '/'));
+            textField.value += "\n";
+        }
+    }
+
     function escape_HTML(html_str) {
         'use strict';
 
@@ -168,6 +254,29 @@
                 ;
         });
     };
+
+    //modal stuff (https://dev.to/ara225/how-to-use-bootstrap-modals-without-jquery-3475)
+    function openModal() {
+        document.getElementById("backdrop").style.display = "block";
+        document.getElementById("download-modal").style.display = "block";
+        document.getElementById("download-modal").className += "show";
+        changeTemplate("raw");
+    }
+    function closeModal() {
+        document.getElementById("backdrop").style.display = "none";
+        document.getElementById("download-modal").style.display = "none";
+        document.getElementById("download-modal").className += document.getElementById("download-modal").className.replace("show", "")
+        document.getElementById("download-links").value = "";
+    }
+    // Get the modal
+    var modal = document.getElementById('download-modal');
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            closeModal()
+        }
+    }
 </script>
 </body>
 </html>
