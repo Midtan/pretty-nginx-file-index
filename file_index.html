@@ -300,7 +300,7 @@
     function closeModal() {
         document.getElementById("backdrop").style.display = "none";
         document.getElementById("download-modal").style.display = "none";
-        document.getElementById("download-modal").className += document.getElementById("download-modal").className.replace("show", "")
+        document.getElementById("download-modal").className += document.getElementById("download-modal").className.replace("show", "");
         document.getElementById("download-links").value = "";
     }
     // Get the modal
@@ -309,9 +309,9 @@
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event) {
         if (event.target == modal) {
-            closeModal()
+            closeModal();
         }
-    }
+    };
 </script>
 </body>
 </html>
