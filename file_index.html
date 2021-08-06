@@ -94,7 +94,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal();">Close</button>
             </div>
         </div>
     </div>
@@ -117,7 +117,9 @@
 
     const iconString = "<span class='fileicon {0}'></span>";
 
-    const dlTemplates = {raw: "{0}", curl: "curl '{0}' > '{1}'", wget: "wget '{0}'"}
+    const dlTemplates = {raw: "{0}",
+                     curl: "curl --create-dirs '{0}' > '{1}'",
+                     wget: "wget -x -nH '{0}'"};
     document.getElementById("download-links-template").addEventListener("keyup", function() {
         fillDownloadLinks();
     });
@@ -138,16 +140,18 @@
                 document.getElementsByTagName("table")[0].style.display = 'table';
                 body.innerHTML = "";
                 body.insertAdjacentHTML("beforeend", "<tr><td><a href='../' onclick=\"on_click_link(this); return false;\">../</a></td><td></td><td></td></tr>");
-                const text = await resp.text();
-                if(text.length === 0)
-                    return;
 
                 if(resp.status !== 200){
                     throw resp.status + " " + resp.statusText;
                 }
 
+                const text = await resp.text();
+                if(text.length === 0){
+                    return;
+                }
+
                 data = JSON.parse(text);
-                for(let entry in data){
+                for(let entry of data){
                     entry = data[entry];
                     const icon = getIconString(entry);
                     let onclick_str = "";
@@ -197,7 +201,7 @@
     }
 
     function formatBytes(bytes, decimals) {
-        if (bytes === 0) return '0 Bytes';
+        if (bytes === 0){ return '0 Bytes'; }
         const k = 1024,
             dm = decimals || 2,
             sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'],
@@ -210,23 +214,54 @@
         fillDownloadLinks();
     }
 
-    function fillDownloadLinks() {
-        const template = document.getElementById("download-links-template").value;
-        const textField = document.getElementById("download-links");
-        textField.value = "";
-        const linkTemplate = "{0}/{1}"
-        for(let entry in data){
-            entry = data[entry];
-            if(entry.type === "directory"){
-                continue;
-            }
-            let link = linkTemplate.format(
-                window.location.href.replace(/\/$/, ""),
-                encodeURIComponent(entry.name.replace('%2F', '/'))
+    function apply_template(name, lT, tmplt){
+        let link = lT.format(
+            window.location.href.replace(/\/$/, ""),
+            encodeURIComponent(name.replace('%2F', '/'))
             );
-            textField.value += template.format(link, entry.name.replace('%2F', '/'));
-            textField.value += "\n";
+        return tmplt.format(link, name.replace('%2F', '/'));
+    }
+
+    function get_data(url, tF, isRecursive=false, getRecursive=false){
+        const linkTemplate = "{0}/{1}";
+        const template = document.getElementById("download-links-template").value;
+        tF.value = "";
+        if(!getRecursive){
+            for(let entry of data){
+                if(entry.type === "directory"){
+                    continue;
+                }
+                let link = linkTemplate.format(
+                    window.location.href.replace(/\/$/, ""),
+                    encodeURIComponent(entry.name.replace('%2F', '/'))
+                );
+                tF.value += template.format(link, entry.name.replace('%2F', '/'));
+                tF.value += "\n";
+            }
+            return;
         }
+        fetch(url).then(async function(resp){
+            if(resp.status !== 200){throw resp.status + " " + resp.statusText;}
+            const t = await resp.text();
+            if(t.length === 0){return [];}
+            const content = JSON.parse(t);
+            for(let entry of content){
+                if(entry.type === "directory"){
+                    if(getRecursive){
+                        get_data(url+entry.name+"/", tF, true, getRecursive);
+                    }
+                    continue;
+                }
+                cmd = apply_template(url.replace("/list", "")+entry.name, linkTemplate, template);
+                tF.value += cmd+"\n";
+            }
+        });
+    }
+
+    function fillDownloadLinks() {
+        const textField = document.getElementById("download-links");
+        console.log("Fetching");
+        get_data("/list" + window.location.pathname, textField);
     }
 
     function escape_HTML(html_str) {
