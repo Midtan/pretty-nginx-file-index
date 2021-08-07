@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <title></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -79,7 +79,9 @@
                     <label><input type="checkbox" id="include-subdirectories">Include subdirectories</label>
                 </div>
                 <div class="btn-croup btn-group-sm" style="float: right;/** God, I hate css**/">
-                    <button type="button" id="copy-downloads-button" class="btn btn-default"><i class="far fa-clipboard"></i>&nbsp;Copy To Clipboard</button>
+                    <button type="button" id="copy-downloads-button" class="btn btn-default"><i
+                            class="far fa-clipboard"></i>&nbsp;Copy To Clipboard
+                    </button>
                 </div>
 
                 <div class="download-links-container form-group">
@@ -120,20 +122,22 @@
 
     const iconString = "<span class='fileicon {0}'></span>";
 
-    const dlTemplates = {raw: "{0}",
+    const dlTemplates = {
+        raw: "{0}",
         curl: "curl --create-dirs '{0}' -o '{1}'",
-        wget: "wget '{0}'"};
+        wget: "wget '{0}'"
+    };
 
     let timer = 0;
-    document.getElementById("download-links-template").addEventListener("input", function() {
-        if(timer > 0){
+    document.getElementById("download-links-template").addEventListener("input", function () {
+        if (timer > 0) {
             clearTimeout(timer);
             timer = 0;
         }
         timer = setTimeout(fillDownloadLinks, 150);
     });
 
-    document.getElementById("include-subdirectories").addEventListener("change", function() {
+    document.getElementById("include-subdirectories").addEventListener("change", function () {
         fillDownloadLinks();
     });
 
@@ -144,30 +148,30 @@
 
     let data = {};
 
-    function update(){
+    function update() {
         const headline = document.getElementById("headerline");
         headline.innerHTML = "Index of " + decodeURIComponent(window.location.pathname);
         fetch("/list" + window.location.pathname)
-            .then(async function(resp){
+            .then(async function (resp) {
                 const body = document.getElementById("filelist-body");
                 document.getElementsByTagName("table")[0].style.display = 'table';
                 body.innerHTML = "";
                 body.insertAdjacentHTML("beforeend", "<tr><td><a href='../' onclick=\"on_click_link(this); return false;\">../</a></td><td></td><td></td></tr>");
 
-                if(resp.status !== 200){
+                if (resp.status !== 200) {
                     throw resp.status + " " + resp.statusText;
                 }
 
                 const text = await resp.text();
-                if(text.length === 0){
+                if (text.length === 0) {
                     return;
                 }
 
                 data = JSON.parse(text);
-                for(let entry of data){
+                for (let entry of data) {
                     const icon = getIconString(entry);
                     let onclick_str = "";
-                    if(entry.type === "directory"){
+                    if (entry.type === "directory") {
                         entry.name += "/";
                         onclick_str = " onclick=\"on_click_link(this); return false;\"";
                     }
@@ -182,18 +186,18 @@
                     ));
                 }
             })
-            .catch(function(err){
+            .catch(function (err) {
                 document.getElementsByTagName("table")[0].style.display = 'none';
                 headline.innerHTML = "<h1 style=\"color: red\"><a href=\".\" onclick=\"history.back(); return false;\" style=\"text-decoration: none; color: gray; padding-right: 15px\"><i class=\"fas fa-chevron-left\"></i></a>" + err + "</h1>";
             });
     }
 
-    function on_click_link(ele){
+    function on_click_link(ele) {
         history.pushState({}, "", ele.pathname);
         update();
     }
 
-    window.onpopstate = function(_){
+    window.onpopstate = function (_) {
         update();
     };
 
@@ -213,7 +217,9 @@
     }
 
     function formatBytes(bytes, decimals) {
-        if (bytes === 0){ return '0 Bytes'; }
+        if (bytes === 0) {
+            return '0 Bytes';
+        }
         const k = 1024,
             dm = decimals || 2,
             sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'],
@@ -226,7 +232,7 @@
         fillDownloadLinks();
     }
 
-    function apply_template(name, lT, tmplt){
+    function apply_template(name, lT, tmplt) {
         let link = lT.format(
             window.location.origin.replace(/\/$/, ""),
             encodeURIComponent(name.replace('%2F', '/'))
@@ -234,33 +240,37 @@
         return tmplt.format(link, name.replace(/\%2F/gi, '/').replace(window.location.pathname.substring(1), "")).replace(/\%2F/gi, '/');
     }
 
-    function get_data(url, tF, getRecursive=false){
+    function get_data(url, tF, getRecursive = false) {
         const linkTemplate = "{0}/{1}";
         const template = document.getElementById("download-links-template").value;
-        if(!getRecursive){
-            for(let entry of data){
-                if(entry.type === "directory"){
+        if (!getRecursive) {
+            for (let entry of data) {
+                if (entry.type === "directory") {
                     continue;
                 }
-                tF.value += apply_template(url.replace("/list/", "")+entry.name, linkTemplate, template);
+                tF.value += apply_template(url.replace("/list/", "") + entry.name, linkTemplate, template);
                 tF.value += "\n";
             }
             return;
         }
-        fetch(url).then(async function(resp){
-            if(resp.status !== 200){throw resp.status + " " + resp.statusText;}
+        fetch(url).then(async function (resp) {
+            if (resp.status !== 200) {
+                throw resp.status + " " + resp.statusText;
+            }
             const t = await resp.text();
-            if(t.length === 0){return [];}
+            if (t.length === 0) {
+                return [];
+            }
             const content = JSON.parse(t);
-            for(let entry of content){
-                if(entry.type === "directory"){
-                    if(getRecursive){
-                        get_data(url+entry.name+"/", tF, getRecursive);
+            for (let entry of content) {
+                if (entry.type === "directory") {
+                    if (getRecursive) {
+                        get_data(url + entry.name + "/", tF, getRecursive);
                     }
                     continue;
                 }
-                cmd = apply_template(url.replace("/list/", "")+entry.name, linkTemplate, template);
-                tF.value += cmd+"\n";
+                cmd = apply_template(url.replace("/list/", "") + entry.name, linkTemplate, template);
+                tF.value += cmd + "\n";
             }
         });
     }
@@ -305,14 +315,16 @@
         document.getElementById("download-modal").className += "show";
         changeTemplate("raw");
     }
+
     function closeModal() {
         document.getElementById("backdrop").style.display = "none";
         document.getElementById("download-modal").style.display = "none";
         document.getElementById("download-modal").className += document.getElementById("download-modal").className.replace("show", "");
         document.getElementById("download-links").value = "";
     }
+
     // Get the modal
-    var modal = document.getElementById('download-modal');
+    let modal = document.getElementById('download-modal');
 
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event) {
