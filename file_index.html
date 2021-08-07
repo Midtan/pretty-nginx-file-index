@@ -152,7 +152,6 @@
 
                 data = JSON.parse(text);
                 for(let entry of data){
-                    entry = data[entry];
                     const icon = getIconString(entry);
                     let onclick_str = "";
                     if(entry.type === "directory"){
@@ -222,7 +221,7 @@
         return tmplt.format(link, name.replace('%2F', '/'));
     }
 
-    function get_data(url, tF, isRecursive=false, getRecursive=false){
+    function get_data(url, tF, getRecursive=false){
         const linkTemplate = "{0}/{1}";
         const template = document.getElementById("download-links-template").value;
         tF.value = "";
@@ -248,7 +247,7 @@
             for(let entry of content){
                 if(entry.type === "directory"){
                     if(getRecursive){
-                        get_data(url+entry.name+"/", tF, true, getRecursive);
+                        get_data(url+entry.name+"/", tF, getRecursive);
                     }
                     continue;
                 }
