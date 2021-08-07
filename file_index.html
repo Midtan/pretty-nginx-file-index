@@ -75,6 +75,9 @@
                 <h4 class="modal-title" id="download-modal-label"><i class="fas fa-download"></i>&nbsp;Download All</h4>
             </div>
             <div class="modal-body">
+                <div class="checkbox-inline">
+                    <label><input type="checkbox" id="include-subdirectories">Include subdirectories</label>
+                </div>
                 <div class="btn-croup btn-group-sm" style="float: right;/** God, I hate css**/">
                     <button type="button" id="copy-downloads-button" class="btn btn-default"><i class="far fa-clipboard"></i>&nbsp;Copy To Clipboard</button>
                 </div>
@@ -118,8 +121,8 @@
     const iconString = "<span class='fileicon {0}'></span>";
 
     const dlTemplates = {raw: "{0}",
-                     curl: "curl --create-dirs '{0}' -o '{1}'",
-                     wget: "wget '{0}'"};
+        curl: "curl --create-dirs '{0}' -o '{1}'",
+        wget: "wget '{0}'"};
 
     let timer = 0;
     document.getElementById("download-links-template").addEventListener("input", function() {
@@ -128,6 +131,10 @@
             timer = 0;
         }
         timer = setTimeout(fillDownloadLinks, 150);
+    });
+
+    document.getElementById("include-subdirectories").addEventListener("change", function() {
+        fillDownloadLinks();
     });
 
     document.getElementById("copy-downloads-button").addEventListener("click", function () {
@@ -223,7 +230,7 @@
         let link = lT.format(
             window.location.origin.replace(/\/$/, ""),
             encodeURIComponent(name.replace('%2F', '/'))
-            );
+        );
         return tmplt.format(link, name.replace(/\%2F/gi, '/').replace(window.location.pathname.substring(1), "")).replace(/\%2F/gi, '/');
     }
 
@@ -260,8 +267,9 @@
 
     function fillDownloadLinks() {
         const textField = document.getElementById("download-links");
+        const includeSub = document.getElementById("include-subdirectories");
         textField.value = "";
-        get_data("/list" + window.location.pathname, textField);
+        get_data("/list" + window.location.pathname, textField, includeSub.checked);
     }
 
     function escape_HTML(html_str) {
