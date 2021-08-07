@@ -252,7 +252,9 @@
                     continue;
                 }
                 cmd = apply_template(url.replace("/list/", "")+entry.name, linkTemplate, template);
-                tF.value += cmd+"\n";
+                if(!tF.value.includes(cmd)){
+                    tF.value += cmd+"\n";
+                }
             }
         });
     }
