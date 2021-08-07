@@ -125,8 +125,9 @@
     document.getElementById("download-links-template").addEventListener("input", function() {
         if(timer > 0){
             clearTimeout(timer);
-            }
-        timer = setTimeout(fillDownloadLinks(), 150);
+            timer = 0;
+        }
+        timer = setTimeout(fillDownloadLinks, 150);
     });
 
     document.getElementById("copy-downloads-button").addEventListener("click", function () {
@@ -252,9 +253,7 @@
                     continue;
                 }
                 cmd = apply_template(url.replace("/list/", "")+entry.name, linkTemplate, template);
-                if(!tF.value.includes(cmd)){
-                    tF.value += cmd+"\n";
-                }
+                tF.value += cmd+"\n";
             }
         });
     }
