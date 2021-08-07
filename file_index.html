@@ -118,8 +118,8 @@
     const iconString = "<span class='fileicon {0}'></span>";
 
     const dlTemplates = {raw: "{0}",
-                     curl: "curl --create-dirs '{0}' > '{1}'",
-                     wget: "wget -x -nH '{0}'"};
+                     curl: "curl --create-dirs '{0}' -o '{1}'",
+                     wget: "wget '{0}'"};
     document.getElementById("download-links-template").addEventListener("keyup", function() {
         fillDownloadLinks();
     });
@@ -215,26 +215,21 @@
 
     function apply_template(name, lT, tmplt){
         let link = lT.format(
-            window.location.href.replace(/\/$/, ""),
+            window.location.origin.replace(/\/$/, ""),
             encodeURIComponent(name.replace('%2F', '/'))
             );
-        return tmplt.format(link, name.replace('%2F', '/'));
+        return tmplt.format(link, name.replace(/\%2F/gi, '/').replace(window.location.pathname.substring(1), "")).replace(/\%2F/gi, '/');
     }
 
     function get_data(url, tF, getRecursive=false){
         const linkTemplate = "{0}/{1}";
         const template = document.getElementById("download-links-template").value;
-        tF.value = "";
         if(!getRecursive){
             for(let entry of data){
                 if(entry.type === "directory"){
                     continue;
                 }
-                let link = linkTemplate.format(
-                    window.location.href.replace(/\/$/, ""),
-                    encodeURIComponent(entry.name.replace('%2F', '/'))
-                );
-                tF.value += template.format(link, entry.name.replace('%2F', '/'));
+                tF.value += apply_template(url.replace("/list/", "")+entry.name, linkTemplate, template);
                 tF.value += "\n";
             }
             return;
@@ -251,7 +246,7 @@
                     }
                     continue;
                 }
-                cmd = apply_template(url.replace("/list", "")+entry.name, linkTemplate, template);
+                cmd = apply_template(url.replace("/list/", "")+entry.name, linkTemplate, template);
                 tF.value += cmd+"\n";
             }
         });
@@ -259,7 +254,7 @@
 
     function fillDownloadLinks() {
         const textField = document.getElementById("download-links");
-        console.log("Fetching");
+        textField.value = "";
         get_data("/list" + window.location.pathname, textField);
     }
 
