@@ -120,8 +120,13 @@
     const dlTemplates = {raw: "{0}",
                      curl: "curl --create-dirs '{0}' -o '{1}'",
                      wget: "wget '{0}'"};
+
+    let timer = 0;
     document.getElementById("download-links-template").addEventListener("keyup", function() {
-        fillDownloadLinks();
+        if(timer > 0){
+            clearTimeout(timer);
+            }
+        timer = setTimeout(fillDownloadLinks(), 150);
     });
 
     document.getElementById("copy-downloads-button").addEventListener("click", function () {
