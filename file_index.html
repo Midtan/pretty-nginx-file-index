@@ -146,7 +146,7 @@
         document.execCommand("copy");
     });
 
-    let data = {};
+    let current_page_data = {};
 
     function update() {
         const headline = document.getElementById("headerline");
@@ -167,8 +167,8 @@
                     return;
                 }
 
-                data = JSON.parse(text);
-                for (let entry of data) {
+                current_page_data = JSON.parse(text);
+                for (let entry of current_page_data) {
                     const icon = getIconString(entry);
                     let onclick_str = "";
                     if (entry.type === "directory") {
@@ -232,54 +232,43 @@
         fillDownloadLinks();
     }
 
-    function apply_template(name, lT, tmplt) {
-        let link = lT.format(
-            window.location.origin.replace(/\/$/, ""),
-            encodeURIComponent(name.replace('%2F', '/'))
-        );
-        return tmplt.format(link, name.replace(/\%2F/gi, '/').replace(window.location.pathname.substring(1), "")).replace(/\%2F/gi, '/');
+    function collect_dl_links(page_data, url_path, outputTextArea, getRecursive = false) {
+        const template = document.getElementById("download-links-template").value;
+        for (let entry of page_data) {
+            let entry_name = encodeURIComponent(entry.name.replace("/", ""));
+            if (entry.type === "directory") {
+                if (getRecursive) {
+                    let recursion_url = url_path + entry_name + "/";
+                    fetch_page_json(recursion_url).then(async function (page_data) {
+                        collect_dl_links(page_data, recursion_url, outputTextArea, true);
+                    });
+                }
+                continue;
+            }
+            // the substring(5) drops the "/list/" prefix to generate working download links
+            let file_link = window.location.origin + url_path.substring(5) + entry_name;
+            outputTextArea.value += template.format(file_link);
+            outputTextArea.value += "\n";
+        }
     }
 
-    function get_data(url, tF, getRecursive = false) {
-        const linkTemplate = "{0}/{1}";
-        const template = document.getElementById("download-links-template").value;
-        if (!getRecursive) {
-            for (let entry of data) {
-                if (entry.type === "directory") {
-                    continue;
-                }
-                tF.value += apply_template(url.replace("/list/", "") + entry.name, linkTemplate, template);
-                tF.value += "\n";
-            }
-            return;
+    async function fetch_page_json(url) {
+        let resp = await fetch(url);
+        if (resp.status !== 200) {
+            throw resp.status + " " + resp.statusText;
         }
-        fetch(url).then(async function (resp) {
-            if (resp.status !== 200) {
-                throw resp.status + " " + resp.statusText;
-            }
-            const t = await resp.text();
-            if (t.length === 0) {
-                return [];
-            }
-            const content = JSON.parse(t);
-            for (let entry of content) {
-                if (entry.type === "directory") {
-                    if (getRecursive) {
-                        get_data(url + entry.name + "/", tF, getRecursive);
-                    }
-                    continue;
-                }
-                cmd = apply_template(url.replace("/list/", "") + entry.name, linkTemplate, template);
-                tF.value += cmd + "\n";
-            }
-        });
+        const t = await resp.text();
+        if (t.length === 0) {
+            return [];
+        }
+        return JSON.parse(t);
     }
 
     function fillDownloadLinks() {
         const textField = document.getElementById("download-links");
         const includeSub = document.getElementById("include-subdirectories");
         textField.value = "";
-        get_data("/list" + window.location.pathname, textField, includeSub.checked);
+        collect_dl_links(current_page_data, "/list" + window.location.pathname, textField, includeSub.checked);
     }
 
     function escape_HTML(html_str) {
