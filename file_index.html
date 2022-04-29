@@ -233,7 +233,6 @@
     }
 
     function collect_dl_links(page_data, url_path, outputTextArea, getRecursive = false) {
-        console.log("fetching files from: " + url_path);
         const template = document.getElementById("download-links-template").value;
         for (let entry of page_data) {
             let entry_name = encodeURIComponent(entry.name.replace("/", ""));
