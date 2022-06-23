@@ -247,7 +247,8 @@
             }
             // the substring(5) drops the "/list/" prefix to generate working download links
             let file_link = window.location.origin + url_path.substring(5) + entry_name;
-            outputTextArea.value += template.format(file_link);
+            // first template arg is just the download link, second arg is the path and filename relative to the base dir
+            outputTextArea.value += template.format(file_link, url_path.substring(5).replace(window.location.pathname, "") + entry_name);
             outputTextArea.value += "\n";
         }
     }
