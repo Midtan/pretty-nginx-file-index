@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8"/>
     <title></title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZjZjNDUzIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2UzYTEyOSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHBhdGggZD0iTTggMTZhNCA0IDAgMCAxIDQtNGgxNGw2IDZoMjBhNCA0IDAgMCAxIDQgNHY0SDh6IiBmaWxsPSIjZjJkMjhhIi8+CiAgPHJlY3QgeD0iOCIgeT0iMjIiIHdpZHRoPSI0OCIgaGVpZ2h0PSIyNiIgcng9IjQiIGZpbGw9InVybCgjZykiIHN0cm9rZT0iI2MyN2MwZSIgc3Ryb2tlLXdpZHRoPSIxIi8+Cjwvc3ZnPg==">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
@@ -107,6 +109,9 @@
 <div class="modal-backdrop fade" id="backdrop" style="display: none;"></div>
 
 <script>
+    const pageTitleTemplate = "{0} - {1}";
+    const headlineTemplate = "Index of {0}";
+
     const iconObject = {
         "far fa-file-archive": ["rar", "zip", "7z", "gz", "bz2", "tgz", "tbz2", "tar"],
         "far fa-file-video": ["mkv", "mp4", "webm", "avi", "m4v", "h264", "mpg", "m2v", "mpeg", "ts", "m2ts", "vob", "mov"],
@@ -150,7 +155,8 @@
 
     function update() {
         const headline = document.getElementById("headerline");
-        headline.innerHTML = "Index of " + decodeURIComponent(window.location.pathname);
+        headline.innerHTML = headlineTemplate.format(decodeURIComponent(window.location.pathname));
+        document.title = pageTitleTemplate.format(decodeURIComponent(window.location.pathname), decodeURIComponent(window.location.host));
         fetch("/list" + window.location.pathname)
             .then(async function (resp) {
                 const body = document.getElementById("filelist-body");
