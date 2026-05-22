@@ -7,14 +7,306 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.6/css/all.css">
 
     <style>
         body {
+            margin: 0;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-size: 16px;
+            line-height: 1.42857143;
+            color: #333;
+            background-color: #fff;
+        }
+
+        a {
+            color: #337ab7;
+            text-decoration: none;
+        }
+
+        a:hover,
+        a:focus {
+            color: #23527c;
+            text-decoration: underline;
+        }
+
+        .container-fluid {
+            margin-right: auto;
+            margin-left: auto;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+
+        h1 {
+            margin: 20px 0 10px;
+            font-size: 36px;
+            font-weight: 500;
+            line-height: 1.1;
+        }
+
+        h4 {
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.1;
+        }
+
+        label {
+            display: inline-block;
+            max-width: 100%;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .btn {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            display: inline-block;
+            margin-bottom: 0;
+            padding: 6px 12px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background-image: none;
+            vertical-align: middle;
+            text-align: center;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            cursor: pointer;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .btn-default,
+        .btn-secondary,
+        .btn:not(.btn-primary):not(.btn-success):not(.btn-info):not(.btn-warning):not(.btn-danger):not(.btn-link) {
+            border-color: #ccc;
+            color: #333;
+            background-color: #fff;
+        }
+
+        .btn-default:hover,
+        .btn-secondary:hover,
+        .btn:not(.btn-primary):not(.btn-success):not(.btn-info):not(.btn-warning):not(.btn-danger):not(.btn-link):hover {
+            border-color: #adadad;
+            background-color: #e6e6e6;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .btn:focus {
+            outline: 5px auto -webkit-focus-ring-color;
+            outline-offset: -2px;
+        }
+
+        .btn-group {
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .btn-group > .btn {
+            position: relative;
+            float: left;
+        }
+
+        .btn-group > .btn + .btn {
+            margin-left: -1px;
+        }
+
+        .btn-group > .btn:first-child {
+            margin-left: 0;
+        }
+
+        .btn-group > .btn:not(:first-child):not(:last-child) {
+            border-radius: 0;
+        }
+
+        .btn-group > .btn:first-child:not(:last-child) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .btn-group > .btn:last-child:not(:first-child) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .btn-group-sm > .btn {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .table {
+            width: 100%;
+            max-width: 100%;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+
+        .table > thead > tr > th {
+            border-bottom: 2px solid #ddd;
+            vertical-align: bottom;
+        }
+
+        .th-sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .table > thead > tr > th,
+        .table > tbody > tr > td {
+            padding: 8px;
+            border-top: 1px solid #ddd;
+            line-height: 1.42857143;
+            vertical-align: top;
+            text-align: left;
+        }
+
+        .table > tbody > tr:first-child > td {
+            border-top: 0;
+        }
+
+        .table-condensed > thead > tr > th,
+        .table-condensed > tbody > tr > td {
+            padding: 5px;
+        }
+
+        .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #f9f9f9;
+        }
+
+        .table-hover > tbody > tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-control {
+            display: block;
+            width: 100%;
+            height: 34px;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            color: #555;
+            background-color: #fff;
+            font-size: 14px;
+            line-height: 1.42857143;
+        }
+
+        .checkbox-inline {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 0;
+            padding-left: 20px;
+            vertical-align: middle;
+            font-weight: 400;
+            cursor: pointer;
+        }
+
+        .checkbox-inline input[type="checkbox"] {
+            position: absolute;
+            margin: 4px 0 0 -20px;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1050;
+            display: none;
+            overflow: hidden;
+            outline: 0;
+        }
+
+        .modal.fade .modal-dialog {
+            transition: transform .3s ease-out;
+            transform: translate(0, -25%);
+        }
+
+        .modal.show .modal-dialog {
+            transform: translate(0, 0);
+        }
+
+        .modal-dialog {
+            position: relative;
+            width: auto;
+            margin: 30px auto;
+            display: table;
+        }
+
+        .modal-content {
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, .2);
+            border-radius: 6px;
+            background-color: #fff;
+            background-clip: padding-box;
+            box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+            outline: 0;
+        }
+
+        .modal-header {
+            min-height: 16.42857143px;
+            padding: 15px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .modal-title {
+            margin: 0;
+            line-height: 1.42857143;
+        }
+
+        .modal-body {
+            position: relative;
+            padding: 15px;
+        }
+
+        .modal-footer {
+            padding: 15px;
+            border-top: 1px solid #e5e5e5;
+            text-align: right;
+        }
+
+        .close {
+            float: right;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            font-size: 21px;
+            font-weight: 700;
+            line-height: 1;
+            opacity: .2;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            opacity: .5;
+            text-decoration: none;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 1040;
+            background-color: #000;
+        }
+
+        .modal-backdrop.fade {
+            opacity: 0;
+        }
+
+        .modal-backdrop.show {
+            opacity: .5;
         }
 
         .fileicon {
@@ -36,9 +328,11 @@
         }
 
         .dl-textarea {
+            height: auto;
             min-width: 569px;
             white-space: pre;
             overflow: auto;
+            resize: vertical;
         }
 
         .modal-dialog {
@@ -80,7 +374,7 @@
                 <div class="checkbox-inline">
                     <label><input type="checkbox" id="include-subdirectories">Include subdirectories</label>
                 </div>
-                <div class="btn-croup btn-group-sm" style="float: right;/** God, I hate css**/">
+                <div class="btn-group btn-group-sm" style="float: right;/** God, I hate css**/">
                     <button type="button" id="download-zip-button" class="btn btn-default"><i
                             class="far fa-file-archive"></i>&nbsp;Download ZIP
                     </button>
@@ -190,6 +484,11 @@
     });
 
     let current_page_data = {};
+    const filenameCollator = new Intl.Collator(undefined, {
+        numeric: true,
+        sensitivity: "base"
+    });
+    let filenameSortDirection = "asc";
 
     function update() {
         const headline = document.getElementById("headerline");
@@ -197,38 +496,15 @@
         document.title = pageTitleTemplate.format(decodeURIComponent(window.location.pathname), decodeURIComponent(window.location.host));
         fetch("/list" + window.location.pathname)
             .then(async function (resp) {
-                const body = document.getElementById("filelist-body");
                 document.getElementsByTagName("table")[0].style.display = 'table';
-                body.innerHTML = "";
-                body.insertAdjacentHTML("beforeend", "<tr><td><a href='../' onclick=\"on_click_link(this); return false;\">../</a></td><td></td><td></td></tr>");
 
                 if (resp.status !== 200) {
                     throw resp.status + " " + resp.statusText;
                 }
 
                 const text = await resp.text();
-                if (text.length === 0) {
-                    return;
-                }
-
-                current_page_data = JSON.parse(text);
-                for (let entry of current_page_data) {
-                    const icon = getIconString(entry);
-                    let onclick_str = "";
-                    if (entry.type === "directory") {
-                        entry.name += "/";
-                        onclick_str = " onclick=\"on_click_link(this); return false;\"";
-                    }
-                    body.insertAdjacentHTML("beforeend", "<tr><td class='td-file-name'><a href=\"{0}/{1}\"{6}>{2} {3}</a></td><td class='td-file-size'>{4}</td><td class='td-file-date'>{5}</td></tr>".format(
-                        decodeURIComponent(window.location.href.replace(/\/$/, "")),
-                        encodeURIComponent(entry.name).replace('%2F', '/'),
-                        iconString.format(icon),
-                        escape_HTML(entry.name),
-                        entry.size ? formatBytes(entry.size, 2) : '-',
-                        entry.mtime,
-                        onclick_str
-                    ));
-                }
+                current_page_data = text.length === 0 ? [] : JSON.parse(text);
+                renderCurrentPageData();
             })
             .catch(function (err) {
                 document.getElementsByTagName("table")[0].style.display = 'none';
@@ -245,7 +521,70 @@
         update();
     };
 
-    document.addEventListener("DOMContentLoaded", update, false);
+    document.addEventListener("DOMContentLoaded", function () {
+        const fileNameHeader = document.querySelector("th.td-file-name");
+        if (fileNameHeader) {
+            fileNameHeader.classList.add("th-sortable");
+            fileNameHeader.addEventListener("click", toggleFilenameSortDirection);
+        }
+        updateFilenameSortHeader();
+        update();
+    }, false);
+
+    function getSortedCurrentPageData() {
+        const sorted = current_page_data.slice();
+        sorted.sort(function (a, b) {
+            const aIsDirectory = a.type === "directory";
+            const bIsDirectory = b.type === "directory";
+            if (aIsDirectory !== bIsDirectory) {
+                if (filenameSortDirection === "asc") {
+                    return aIsDirectory ? -1 : 1;
+                }
+                return aIsDirectory ? 1 : -1;
+            }
+            const cmp = filenameCollator.compare(a.name, b.name);
+            return filenameSortDirection === "desc" ? -cmp : cmp;
+        });
+        return sorted;
+    }
+
+    function renderCurrentPageData() {
+        const body = document.getElementById("filelist-body");
+        body.innerHTML = "";
+        body.insertAdjacentHTML("beforeend", "<tr><td><a href='../' onclick=\"on_click_link(this); return false;\">../</a></td><td></td><td></td></tr>");
+
+        const entries = getSortedCurrentPageData();
+        for (let entry of entries) {
+            const icon = getIconString(entry);
+            const isDirectory = entry.type === "directory";
+            const displayName = isDirectory ? entry.name + "/" : entry.name;
+            const onclick_str = isDirectory ? " onclick=\"on_click_link(this); return false;\"" : "";
+
+            body.insertAdjacentHTML("beforeend", "<tr><td class='td-file-name'><a href=\"{0}/{1}\"{6}>{2} {3}</a></td><td class='td-file-size'>{4}</td><td class='td-file-date'>{5}</td></tr>".format(
+                decodeURIComponent(window.location.href.replace(/\/$/, "")),
+                encodeURIComponent(displayName).replace('%2F', '/'),
+                iconString.format(icon),
+                escape_HTML(displayName),
+                entry.size ? formatBytes(entry.size, 2) : '-',
+                entry.mtime,
+                onclick_str
+            ));
+        }
+    }
+
+    function toggleFilenameSortDirection() {
+        filenameSortDirection = filenameSortDirection === "asc" ? "desc" : "asc";
+        updateFilenameSortHeader();
+        renderCurrentPageData();
+    }
+
+    function updateFilenameSortHeader() {
+        const fileNameHeader = document.querySelector("th.td-file-name");
+        if (!fileNameHeader) {
+            return;
+        }
+        fileNameHeader.textContent = "File Name " + (filenameSortDirection === "asc" ? "▲" : "▼");
+    }
 
     function getIconString(entry) {
         if (entry.type === "directory") {
@@ -368,7 +707,8 @@
     function openModal() {
         document.getElementById("backdrop").style.display = "block";
         document.getElementById("download-modal").style.display = "block";
-        document.getElementById("download-modal").className += "show";
+        document.getElementById("backdrop").classList.add("show");
+        document.getElementById("download-modal").classList.add("show");
         document.getElementById("zip-status-text").textContent = "";
         changeTemplate("raw");
     }
@@ -376,7 +716,8 @@
     function closeModal() {
         document.getElementById("backdrop").style.display = "none";
         document.getElementById("download-modal").style.display = "none";
-        document.getElementById("download-modal").className += document.getElementById("download-modal").className.replace("show", "");
+        document.getElementById("backdrop").classList.remove("show");
+        document.getElementById("download-modal").classList.remove("show");
         document.getElementById("download-links").value = "";
         document.getElementById("zip-status-text").textContent = "";
     }
