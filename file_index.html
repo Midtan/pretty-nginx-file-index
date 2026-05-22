@@ -10,132 +10,297 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.6/css/all.css">
 
     <style>
-        :root {
-            --ui-bg: #ffffff;
-            --ui-text: #212529;
-            --ui-border: #dee2e6;
-            --ui-muted: #6c757d;
-            --ui-hover: #f5f7f9;
-            --ui-backdrop: rgba(0, 0, 0, 0.5);
-            --ui-primary: #0d6efd;
-            --ui-primary-hover: #0b5ed7;
-        }
-
         body {
             margin: 0;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-size: 16px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            color: var(--ui-text);
-            background: var(--ui-bg);
-            line-height: 1.4;
+            line-height: 1.42857143;
+            color: #333;
+            background-color: #fff;
+        }
+
+        a {
+            color: #337ab7;
+            text-decoration: none;
+        }
+
+        a:hover,
+        a:focus {
+            color: #23527c;
+            text-decoration: underline;
         }
 
         .container-fluid {
-            padding: 1.25rem;
+            margin-right: auto;
+            margin-left: auto;
+            padding-right: 15px;
+            padding-left: 15px;
         }
 
         h1 {
-            margin: 0 0 1rem 0;
-            font-size: 2rem;
-            font-weight: 600;
+            margin: 20px 0 10px;
+            font-size: 36px;
+            font-weight: 500;
+            line-height: 1.1;
+        }
+
+        h4 {
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.1;
+        }
+
+        label {
+            display: inline-block;
+            max-width: 100%;
+            margin-bottom: 5px;
+            font-weight: 700;
         }
 
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.35rem;
-            padding: 0.4rem 0.75rem;
-            border: 1px solid #c5ccd3;
-            border-radius: 6px;
-            background: #fff;
-            color: #212529;
+            display: inline-block;
+            margin-bottom: 0;
+            padding: 6px 12px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background-image: none;
+            vertical-align: middle;
+            text-align: center;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
             cursor: pointer;
-            text-decoration: none;
-            font-size: 0.95rem;
-            line-height: 1.3;
-        }
-
-        .btn:hover {
-            background: #f8f9fa;
-        }
-
-        .btn:focus-visible {
-            outline: 2px solid rgba(13, 110, 253, 0.3);
-            outline-offset: 1px;
+            touch-action: manipulation;
+            user-select: none;
         }
 
         .btn-default,
-        .btn-secondary {
-            background: #fff;
+        .btn-secondary,
+        .btn:not(.btn-primary):not(.btn-success):not(.btn-info):not(.btn-warning):not(.btn-danger):not(.btn-link) {
+            border-color: #ccc;
+            color: #333;
+            background-color: #fff;
+        }
+
+        .btn-default:hover,
+        .btn-secondary:hover,
+        .btn:not(.btn-primary):not(.btn-success):not(.btn-info):not(.btn-warning):not(.btn-danger):not(.btn-link):hover {
+            border-color: #adadad;
+            background-color: #e6e6e6;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .btn:focus {
+            outline: 5px auto -webkit-focus-ring-color;
+            outline-offset: -2px;
         }
 
         .btn-group {
-            display: inline-flex;
+            position: relative;
+            display: inline-block;
             vertical-align: middle;
         }
 
         .btn-group > .btn {
-            border-radius: 0;
+            position: relative;
+            float: left;
+        }
+
+        .btn-group > .btn + .btn {
             margin-left: -1px;
         }
 
         .btn-group > .btn:first-child {
-            border-top-left-radius: 6px;
-            border-bottom-left-radius: 6px;
             margin-left: 0;
         }
 
-        .btn-group > .btn:last-child {
-            border-top-right-radius: 6px;
-            border-bottom-right-radius: 6px;
+        .btn-group > .btn:not(:first-child):not(:last-child) {
+            border-radius: 0;
+        }
+
+        .btn-group > .btn:first-child:not(:last-child) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .btn-group > .btn:last-child:not(:first-child) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
         }
 
         .btn-group-sm > .btn {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.85rem;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            line-height: 1.5;
         }
 
         .table {
             width: 100%;
+            max-width: 100%;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-spacing: 0;
             border-collapse: collapse;
-            margin-top: 0.75rem;
         }
 
-        .table th,
-        .table td {
-            padding: 0.5rem 0.75rem;
-            border-top: 1px solid var(--ui-border);
+        .table > thead > tr > th {
+            border-bottom: 2px solid #ddd;
+            vertical-align: bottom;
+        }
+
+        .table > thead > tr > th,
+        .table > tbody > tr > td {
+            padding: 8px;
+            border-top: 1px solid #ddd;
+            line-height: 1.42857143;
+            vertical-align: top;
             text-align: left;
-            vertical-align: middle;
         }
 
-        .table thead th {
+        .table > tbody > tr:first-child > td {
             border-top: 0;
-            border-bottom: 2px solid var(--ui-border);
         }
 
-        .table-condensed th,
-        .table-condensed td {
-            padding-top: 0.35rem;
-            padding-bottom: 0.35rem;
+        .table-condensed > thead > tr > th,
+        .table-condensed > tbody > tr > td {
+            padding: 5px;
         }
 
-        .table-striped tbody tr:nth-of-type(odd) {
-            background: #fbfcfd;
+        .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #f9f9f9;
         }
 
-        .table-hover tbody tr:hover {
-            background: var(--ui-hover);
+        .table-hover > tbody > tr:hover {
+            background-color: #f5f5f5;
         }
 
-        .table a {
-            color: #0a58ca;
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-control {
+            display: block;
+            width: 100%;
+            height: 34px;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            color: #555;
+            background-color: #fff;
+            font-size: 14px;
+            line-height: 1.42857143;
+        }
+
+        .checkbox-inline {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 0;
+            padding-left: 20px;
+            vertical-align: middle;
+            font-weight: 400;
+            cursor: pointer;
+        }
+
+        .checkbox-inline input[type="checkbox"] {
+            position: absolute;
+            margin: 4px 0 0 -20px;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1050;
+            display: none;
+            overflow: hidden;
+            outline: 0;
+        }
+
+        .modal.fade .modal-dialog {
+            transition: transform .3s ease-out;
+            transform: translate(0, -25%);
+        }
+
+        .modal.show .modal-dialog {
+            transform: translate(0, 0);
+        }
+
+        .modal-dialog {
+            position: relative;
+            width: auto;
+            margin: 30px auto;
+            display: table;
+        }
+
+        .modal-content {
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, .2);
+            border-radius: 6px;
+            background-color: #fff;
+            background-clip: padding-box;
+            box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+            outline: 0;
+        }
+
+        .modal-header {
+            min-height: 16.42857143px;
+            padding: 15px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .modal-title {
+            margin: 0;
+            line-height: 1.42857143;
+        }
+
+        .modal-body {
+            position: relative;
+            padding: 15px;
+        }
+
+        .modal-footer {
+            padding: 15px;
+            border-top: 1px solid #e5e5e5;
+            text-align: right;
+        }
+
+        .close {
+            float: right;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            font-size: 21px;
+            font-weight: 700;
+            line-height: 1;
+            opacity: .2;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            opacity: .5;
             text-decoration: none;
         }
 
-        .table a:hover {
-            text-decoration: underline;
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 1040;
+            background-color: #000;
+        }
+
+        .modal-backdrop.fade {
+            opacity: 0;
+        }
+
+        .modal-backdrop.show {
+            opacity: .5;
         }
 
         .fileicon {
@@ -157,117 +322,11 @@
         }
 
         .dl-textarea {
+            height: auto;
             min-width: 569px;
             white-space: pre;
             overflow: auto;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-control {
-            display: block;
-            width: 100%;
-            box-sizing: border-box;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            padding: 0.4rem 0.65rem;
-            font-size: 0.95rem;
-            line-height: 1.4;
-            color: var(--ui-text);
-            background: #fff;
-        }
-
-        .form-control:focus {
-            border-color: #86b7fe;
-            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.2);
-            outline: none;
-        }
-
-        .checkbox-inline {
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .checkbox-inline input[type="checkbox"] {
-            margin-right: 0.4rem;
-        }
-
-        .modal {
-            position: fixed;
-            inset: 0;
-            z-index: 1050;
-            display: none;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-
-        .modal.show {
-            display: block;
-        }
-
-        .modal-dialog {
-            position: relative;
-            width: auto;
-            max-width: 900px;
-            margin: 1.75rem auto;
-            display: table;
-        }
-
-        .modal-content {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            background: #fff;
-            border: 1px solid rgba(0, 0, 0, 0.18);
-            border-radius: 8px;
-            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
-        }
-
-        .modal-header,
-        .modal-body,
-        .modal-footer {
-            padding: 0.9rem 1rem;
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--ui-border);
-        }
-
-        .modal-title {
-            margin: 0;
-            font-size: 1.15rem;
-            font-weight: 600;
-        }
-
-        .close {
-            border: 0;
-            background: transparent;
-            color: var(--ui-muted);
-            cursor: pointer;
-            font-size: 1.6rem;
-            line-height: 1;
-            padding: 0 0.15rem;
-        }
-
-        .close:hover {
-            color: #495057;
-        }
-
-        .modal-footer {
-            border-top: 1px solid var(--ui-border);
-            text-align: right;
-        }
-
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            z-index: 1040;
-            background: var(--ui-backdrop);
+            resize: vertical;
         }
     </style>
 </head>
@@ -317,7 +376,7 @@
 
                 <div class="download-links-template-container form-group">
                     <label for="download-links-template">Template</label>
-                    <div class="btn-group btn-group-sm" style="float: right;/** God, I hate css**/">
+                    <div class="btn-group btn-group-sm" style="float: right;">
                         <button type="button" class="btn btn-default" onclick="changeTemplate('raw')">raw</button>
                         <button type="button" class="btn btn-default" onclick="changeTemplate('curl')">cURL</button>
                         <button type="button" class="btn btn-default" onclick="changeTemplate('wget')">wget</button>
@@ -533,6 +592,7 @@
     function openModal() {
         document.getElementById("backdrop").style.display = "block";
         document.getElementById("download-modal").style.display = "block";
+        document.getElementById("backdrop").classList.add("show");
         document.getElementById("download-modal").classList.add("show");
         changeTemplate("raw");
     }
@@ -540,6 +600,7 @@
     function closeModal() {
         document.getElementById("backdrop").style.display = "none";
         document.getElementById("download-modal").style.display = "none";
+        document.getElementById("backdrop").classList.remove("show");
         document.getElementById("download-modal").classList.remove("show");
         document.getElementById("download-links").value = "";
     }
