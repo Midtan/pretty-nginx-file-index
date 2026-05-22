@@ -152,6 +152,11 @@
             vertical-align: bottom;
         }
 
+        .th-sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+
         .table > thead > tr > th,
         .table > tbody > tr > td {
             padding: 8px;
@@ -436,6 +441,11 @@
     });
 
     let current_page_data = {};
+    const filenameCollator = new Intl.Collator(undefined, {
+        numeric: true,
+        sensitivity: "base"
+    });
+    let filenameSortDirection = "asc";
 
     function update() {
         const headline = document.getElementById("headerline");
@@ -443,38 +453,15 @@
         document.title = pageTitleTemplate.format(decodeURIComponent(window.location.pathname), decodeURIComponent(window.location.host));
         fetch("/list" + window.location.pathname)
             .then(async function (resp) {
-                const body = document.getElementById("filelist-body");
                 document.getElementsByTagName("table")[0].style.display = 'table';
-                body.innerHTML = "";
-                body.insertAdjacentHTML("beforeend", "<tr><td><a href='../' onclick=\"on_click_link(this); return false;\">../</a></td><td></td><td></td></tr>");
 
                 if (resp.status !== 200) {
                     throw resp.status + " " + resp.statusText;
                 }
 
                 const text = await resp.text();
-                if (text.length === 0) {
-                    return;
-                }
-
-                current_page_data = JSON.parse(text);
-                for (let entry of current_page_data) {
-                    const icon = getIconString(entry);
-                    let onclick_str = "";
-                    if (entry.type === "directory") {
-                        entry.name += "/";
-                        onclick_str = " onclick=\"on_click_link(this); return false;\"";
-                    }
-                    body.insertAdjacentHTML("beforeend", "<tr><td class='td-file-name'><a href=\"{0}/{1}\"{6}>{2} {3}</a></td><td class='td-file-size'>{4}</td><td class='td-file-date'>{5}</td></tr>".format(
-                        decodeURIComponent(window.location.href.replace(/\/$/, "")),
-                        encodeURIComponent(entry.name).replace('%2F', '/'),
-                        iconString.format(icon),
-                        escape_HTML(entry.name),
-                        entry.size ? formatBytes(entry.size, 2) : '-',
-                        entry.mtime,
-                        onclick_str
-                    ));
-                }
+                current_page_data = text.length === 0 ? [] : JSON.parse(text);
+                renderCurrentPageData();
             })
             .catch(function (err) {
                 document.getElementsByTagName("table")[0].style.display = 'none';
@@ -491,7 +478,70 @@
         update();
     };
 
-    document.addEventListener("DOMContentLoaded", update, false);
+    document.addEventListener("DOMContentLoaded", function () {
+        const fileNameHeader = document.querySelector("th.td-file-name");
+        if (fileNameHeader) {
+            fileNameHeader.classList.add("th-sortable");
+            fileNameHeader.addEventListener("click", toggleFilenameSortDirection);
+        }
+        updateFilenameSortHeader();
+        update();
+    }, false);
+
+    function getSortedCurrentPageData() {
+        const sorted = current_page_data.slice();
+        sorted.sort(function (a, b) {
+            const aIsDirectory = a.type === "directory";
+            const bIsDirectory = b.type === "directory";
+            if (aIsDirectory !== bIsDirectory) {
+                if (filenameSortDirection === "asc") {
+                    return aIsDirectory ? -1 : 1;
+                }
+                return aIsDirectory ? 1 : -1;
+            }
+            const cmp = filenameCollator.compare(a.name, b.name);
+            return filenameSortDirection === "desc" ? -cmp : cmp;
+        });
+        return sorted;
+    }
+
+    function renderCurrentPageData() {
+        const body = document.getElementById("filelist-body");
+        body.innerHTML = "";
+        body.insertAdjacentHTML("beforeend", "<tr><td><a href='../' onclick=\"on_click_link(this); return false;\">../</a></td><td></td><td></td></tr>");
+
+        const entries = getSortedCurrentPageData();
+        for (let entry of entries) {
+            const icon = getIconString(entry);
+            const isDirectory = entry.type === "directory";
+            const displayName = isDirectory ? entry.name + "/" : entry.name;
+            const onclick_str = isDirectory ? " onclick=\"on_click_link(this); return false;\"" : "";
+
+            body.insertAdjacentHTML("beforeend", "<tr><td class='td-file-name'><a href=\"{0}/{1}\"{6}>{2} {3}</a></td><td class='td-file-size'>{4}</td><td class='td-file-date'>{5}</td></tr>".format(
+                decodeURIComponent(window.location.href.replace(/\/$/, "")),
+                encodeURIComponent(displayName).replace('%2F', '/'),
+                iconString.format(icon),
+                escape_HTML(displayName),
+                entry.size ? formatBytes(entry.size, 2) : '-',
+                entry.mtime,
+                onclick_str
+            ));
+        }
+    }
+
+    function toggleFilenameSortDirection() {
+        filenameSortDirection = filenameSortDirection === "asc" ? "desc" : "asc";
+        updateFilenameSortHeader();
+        renderCurrentPageData();
+    }
+
+    function updateFilenameSortHeader() {
+        const fileNameHeader = document.querySelector("th.td-file-name");
+        if (!fileNameHeader) {
+            return;
+        }
+        fileNameHeader.textContent = "File Name " + (filenameSortDirection === "asc" ? "▲" : "▼");
+    }
 
     function getIconString(entry) {
         if (entry.type === "directory") {
