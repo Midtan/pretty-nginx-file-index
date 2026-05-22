@@ -81,6 +81,9 @@
                     <label><input type="checkbox" id="include-subdirectories">Include subdirectories</label>
                 </div>
                 <div class="btn-croup btn-group-sm" style="float: right;/** God, I hate css**/">
+                    <button type="button" id="download-zip-button" class="btn btn-default"><i
+                            class="far fa-file-archive"></i>&nbsp;Download ZIP
+                    </button>
                     <button type="button" id="copy-downloads-button" class="btn btn-default"><i
                             class="far fa-clipboard"></i>&nbsp;Copy To Clipboard
                     </button>
@@ -99,6 +102,7 @@
                     </div>
                     <input type="text" id="download-links-template" class="form-control">
                 </div>
+                <div id="zip-status-text" style="min-height: 20px;"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal();">Close</button>
@@ -149,6 +153,40 @@
     document.getElementById("copy-downloads-button").addEventListener("click", function () {
         document.getElementById("download-links").select();
         document.execCommand("copy");
+    });
+
+    document.getElementById("download-zip-button").addEventListener("click", async function () {
+        const includeSub = document.getElementById("include-subdirectories").checked;
+        const statusEle = document.getElementById("zip-status-text");
+        statusEle.textContent = "Collecting files...";
+        this.disabled = true;
+        try {
+            const entries = await collectDownloadEntries("/list" + window.location.pathname, includeSub);
+            if (entries.length === 0) {
+                statusEle.textContent = "No files to archive on this page.";
+                return;
+            }
+
+            const archiveName = makeArchiveName(window.location.pathname);
+            if (!zipSupportsBrowserDownload()) {
+                statusEle.textContent = "Streaming ZIP download is unavailable in this browser.";
+                return;
+            }
+
+            statusEle.textContent = "Saving ZIP...";
+            await createZipDownload(entries, {
+                fileName: archiveName,
+                onProgress: function (progress) {
+                    statusEle.textContent = "Archived " + progress.completedFiles + "/" + progress.totalFiles + ": " + progress.currentPath;
+                }
+            });
+            statusEle.textContent = "ZIP saved successfully.";
+        } catch (err) {
+            statusEle.textContent = "ZIP failed: " + err;
+            console.error(err);
+        } finally {
+            this.disabled = false;
+        }
     });
 
     let current_page_data = {};
@@ -238,24 +276,46 @@
         fillDownloadLinks();
     }
 
-    function collect_dl_links(page_data, url_path, outputTextArea, getRecursive = false) {
-        const template = document.getElementById("download-links-template").value;
-        for (let entry of page_data) {
-            let entry_name = encodeURIComponent(entry.name.replace("/", ""));
+    async function collectDownloadEntries(url_path, getRecursive) {
+        const pageData = await fetch_page_json(url_path);
+        let links = [];
+
+        for (let i = 0; i < pageData.length; i++) {
+            const entry = pageData[i];
+            const entryName = encodeURIComponent(entry.name.replace("/", ""));
             if (entry.type === "directory") {
                 if (getRecursive) {
-                    let recursion_url = url_path + entry_name + "/";
-                    fetch_page_json(recursion_url).then(async function (page_data) {
-                        collect_dl_links(page_data, recursion_url, outputTextArea, true);
-                    });
+                    const recursionUrl = url_path + entryName + "/";
+                    const subEntries = await collectDownloadEntries(recursionUrl, true);
+                    links.push.apply(links, subEntries);
                 }
                 continue;
             }
-            // the substring(5) drops the "/list/" prefix to generate working download links
-            let file_link = window.location.origin + url_path.substring(5) + entry_name;
-            // first template arg is just the download link, second arg is the path and filename relative to the base dir
-            outputTextArea.value += template.format(file_link, url_path.substring(5).replace(window.location.pathname, "") + entry_name);
-            outputTextArea.value += "\n";
+
+            links.push({
+                url: window.location.origin + url_path.substring(5) + entryName,
+                type: entry.type,
+                path: decodeURIComponent(url_path.substring(6) + entryName),
+                date: new Date(entry.mtime)
+            });
+        }
+        return links;
+    }
+
+    function makeArchiveName(pathname) {
+        const clean = decodeURIComponent(pathname || "/").replace(/\/+$/, "").split("/").filter(Boolean).join("_");
+        return (clean.length ? clean : "root") + ".zip";
+    }
+
+    async function generate_dl_links(url_path, outputTextArea, getRecursive) {
+        const template = document.getElementById("download-links-template").value;
+        const links = await collectDownloadEntries(url_path, getRecursive);
+        for (let i = 0; i < links.length; i++) {
+            const entry = links[i];
+            if (entry.type !== "directory") {
+                outputTextArea.value += template.format(entry.url, entry.path);
+                outputTextArea.value += "\n";
+            }
         }
     }
 
@@ -271,11 +331,11 @@
         return JSON.parse(t);
     }
 
-    function fillDownloadLinks() {
+    async function fillDownloadLinks() {
         const textField = document.getElementById("download-links");
         const includeSub = document.getElementById("include-subdirectories");
         textField.value = "";
-        collect_dl_links(current_page_data, "/list" + window.location.pathname, textField, includeSub.checked);
+        await generate_dl_links("/list" + window.location.pathname, textField, includeSub.checked);
     }
 
     function escape_HTML(html_str) {
@@ -309,6 +369,7 @@
         document.getElementById("backdrop").style.display = "block";
         document.getElementById("download-modal").style.display = "block";
         document.getElementById("download-modal").className += "show";
+        document.getElementById("zip-status-text").textContent = "";
         changeTemplate("raw");
     }
 
@@ -317,6 +378,7 @@
         document.getElementById("download-modal").style.display = "none";
         document.getElementById("download-modal").className += document.getElementById("download-modal").className.replace("show", "");
         document.getElementById("download-links").value = "";
+        document.getElementById("zip-status-text").textContent = "";
     }
 
     // Get the modal
@@ -329,5 +391,6 @@
         }
     };
 </script>
+<script src="/zip.js"></script>
 </body>
 </html>
