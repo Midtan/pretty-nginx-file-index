@@ -371,10 +371,14 @@
                     <label><input type="checkbox" id="include-subdirectories">Include subdirectories</label>
                 </div>
                 <div class="btn-group btn-group-sm" style="float: right;">
+                    <button type="button" id="download-zip-button" class="btn btn-default"><i
+                            class="far fa-file-archive"></i>&nbsp;Download ZIP
+                    </button>
                     <button type="button" id="copy-downloads-button" class="btn btn-default"><i
                             class="far fa-clipboard"></i>&nbsp;Copy To Clipboard
                     </button>
                 </div>
+                <div id="zip-download-status" style="clear: both; min-height: 20px;"></div>
 
                 <div class="download-links-container form-group">
                     <textarea id="download-links" class="form-control dl-textarea" rows="15" readonly></textarea>
@@ -441,7 +445,13 @@
         document.execCommand("copy");
     });
 
-    let current_page_data = {};
+    document.getElementById("download-zip-button").addEventListener("click", function () {
+        startZipDownload();
+    });
+
+    let current_page_data = [];
+    let zip_download_in_progress = false;
+    const zip_download_warning_message = "A ZIP download is still in progress. Leaving this page or closing this tab will probably truncate the download before it is properly finished.";
     const filenameCollator = new Intl.Collator(undefined, {
         numeric: true,
         sensitivity: "base"
@@ -452,16 +462,10 @@
         const headline = document.getElementById("headerline");
         headline.innerHTML = headlineTemplate.format(decodeURIComponent(window.location.pathname));
         document.title = pageTitleTemplate.format(decodeURIComponent(window.location.pathname), decodeURIComponent(window.location.host));
-        fetch("/list" + window.location.pathname)
-            .then(async function (resp) {
+        fetch_page_json("/list" + window.location.pathname)
+            .then(function (page_data) {
                 document.getElementsByTagName("table")[0].style.display = 'table';
-
-                if (resp.status !== 200) {
-                    throw resp.status + " " + resp.statusText;
-                }
-
-                const text = await resp.text();
-                current_page_data = text.length === 0 ? [] : JSON.parse(text);
+                current_page_data = page_data;
                 renderCurrentPageData();
             })
             .catch(function (err) {
@@ -474,6 +478,54 @@
         history.pushState({}, "", ele.pathname);
         update();
     }
+
+    function warn_before_leaving_during_zip_download(event) {
+        if (!zip_download_in_progress) {
+            return;
+        }
+
+        event.preventDefault();
+        event.returnValue = zip_download_warning_message;
+        return zip_download_warning_message;
+    }
+
+    function should_warn_about_anchor_navigation(link, event) {
+        if (!zip_download_in_progress || event.defaultPrevented || event.button !== 0) {
+            return false;
+        }
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+            return false;
+        }
+        if (link.hasAttribute("download")) {
+            return false;
+        }
+        if (link.target && link.target.toLowerCase() !== "_self") {
+            return false;
+        }
+        if (link.getAttribute("onclick") && link.getAttribute("onclick").indexOf("on_click_link") !== -1) {
+            return false;
+        }
+
+        const url = new URL(link.href, window.location.href);
+        return url.href !== window.location.href && !url.pathname.startsWith("/__zip_download__/");
+    }
+
+    window.addEventListener("beforeunload", warn_before_leaving_during_zip_download);
+
+    document.addEventListener("click", function (event) {
+        if (!(event.target instanceof Element)) {
+            return;
+        }
+
+        const link = event.target.closest("a[href]");
+        if (!link || !should_warn_about_anchor_navigation(link, event)) {
+            return;
+        }
+
+        if (!window.confirm(zip_download_warning_message)) {
+            event.preventDefault();
+        }
+    });
 
     window.onpopstate = function (_) {
         update();
@@ -573,25 +625,41 @@
         fillDownloadLinks();
     }
 
-    function collect_dl_links(page_data, url_path, outputTextArea, getRecursive = false) {
-        const template = document.getElementById("download-links-template").value;
+    async function collect_download_entries(page_data, url_path, getRecursive, zipPrefix = "") {
+        const entries = [];
+        const subdirectory_fetches = [];
+        const file_path = url_path.substring(5);
+
         for (let entry of page_data) {
-            let entry_name = encodeURIComponent(entry.name.replace("/", ""));
+            const entry_name = entry.name.replace(/\/+$/, "");
+            const encoded_entry_name = encodeURIComponent(entry_name);
+
             if (entry.type === "directory") {
                 if (getRecursive) {
-                    let recursion_url = url_path + entry_name + "/";
-                    fetch_page_json(recursion_url).then(async function (page_data) {
-                        collect_dl_links(page_data, recursion_url, outputTextArea, true);
-                    });
+                    const recursion_url = url_path + encoded_entry_name + "/";
+                    subdirectory_fetches.push(fetch_page_json(recursion_url).then(function (recursion_page_data) {
+                        return collect_download_entries(recursion_page_data, recursion_url, true, zipPrefix + entry_name + "/");
+                    }));
                 }
                 continue;
             }
-            // the substring(5) drops the "/list/" prefix to generate working download links
-            let file_link = window.location.origin + url_path.substring(5) + entry_name;
-            // first template arg is just the download link, second arg is the path and filename relative to the base dir
-            outputTextArea.value += template.format(file_link, url_path.substring(5).replace(window.location.pathname, "") + entry_name);
-            outputTextArea.value += "\n";
+
+            const file_link = window.location.origin + file_path + encoded_entry_name;
+            entries.push({
+                url: file_link,
+                downloadPath: file_path.replace(window.location.pathname, "") + encoded_entry_name,
+                path: zipPrefix + entry_name,
+                mtime: entry.mtime,
+                size: entry.size
+            });
         }
+
+        const subdirectory_entries = await Promise.all(subdirectory_fetches);
+        for (let entry_list of subdirectory_entries) {
+            entries.push(...entry_list);
+        }
+
+        return entries;
     }
 
     async function fetch_page_json(url) {
@@ -606,11 +674,144 @@
         return JSON.parse(t);
     }
 
-    function fillDownloadLinks() {
+    async function fillDownloadLinks() {
         const textField = document.getElementById("download-links");
         const includeSub = document.getElementById("include-subdirectories");
+        const template = document.getElementById("download-links-template").value;
+        const entries = await collect_download_entries(current_page_data, "/list" + window.location.pathname, includeSub.checked);
+
         textField.value = "";
-        collect_dl_links(current_page_data, "/list" + window.location.pathname, textField, includeSub.checked);
+        for (let entry of entries) {
+            // first template arg is just the download link, second arg is the path and filename relative to the base dir
+            textField.value += template.format(entry.url, entry.downloadPath);
+            textField.value += "\n";
+        }
+    }
+
+    async function startZipDownload() {
+        const zipButton = document.getElementById("download-zip-button");
+        const zipStatus = document.getElementById("zip-download-status");
+        const includeSub = document.getElementById("include-subdirectories");
+
+        zipButton.disabled = true;
+
+        try {
+            if (!("serviceWorker" in navigator)) {
+                zipStatus.textContent = "Service workers are not available in this browser.";
+                return;
+            }
+            if (!window.isSecureContext) {
+                zipStatus.textContent = "Service workers require HTTPS.";
+                return;
+            }
+
+            zipStatus.textContent = "Collecting files...";
+            const files = await collect_download_entries(current_page_data, "/list" + window.location.pathname, includeSub.checked);
+            if (files.length === 0) {
+                zipStatus.textContent = "No files to zip.";
+                return;
+            }
+
+            zipStatus.textContent = "Preparing ZIP...";
+            await navigator.serviceWorker.register("/sw.js", {scope: "/"});
+            const registration = await navigator.serviceWorker.ready;
+
+            if (!navigator.serviceWorker.controller) {
+                const controllerChanged = new Promise(function (resolve) {
+                    navigator.serviceWorker.addEventListener("controllerchange", resolve, {once: true});
+                });
+                registration.active.postMessage({type: "CLAIM_CLIENTS"});
+                await controllerChanged;
+            }
+
+            const path = decodeURIComponent(window.location.pathname).replace(/\/+$/, "");
+            const lastPart = path.split("/").filter(Boolean).pop() || "download";
+            const filename = lastPart.replace(/[\\/:*?"<>|]+/g, "_") + ".zip";
+            const token = crypto.randomUUID();
+
+            const createJobResponse = await post_service_worker_message({
+                type: "ZIP_CREATE_JOB",
+                token: token,
+                filename: filename,
+                files: files
+            }, 2000);
+            if (createJobResponse == null) {
+                console.error("Timed out waiting for ZIP_CREATE_JOB response.");
+            }
+            const downloadLink = document.createElement("a");
+            downloadLink.href = "/__zip_download__/" + encodeURIComponent(token) + "/" + encodeURIComponent(filename);
+            downloadLink.download = filename;
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            downloadLink.remove();
+
+            start_zip_keepalive();
+            zipStatus.textContent = "ZIP download started. Keep this tab open until the download finishes.";
+        } catch (err) {
+            console.error(err);
+            zipStatus.textContent = "ZIP download failed: " + err;
+        } finally {
+            zipButton.disabled = false;
+        }
+    }
+
+    function post_service_worker_message(message, timeoutMs) {
+        return new Promise(function (resolve) {
+            const channel = new MessageChannel();
+
+            channel.port1.onmessage = function (event) {
+                channel.port1.close();
+                resolve(event.data);
+            };
+
+            if (timeoutMs !== undefined) {
+                setTimeout(function () {
+                    channel.port1.close();
+                    resolve(null);
+                }, timeoutMs);
+            }
+
+            navigator.serviceWorker.controller.postMessage(message, [channel.port2]);
+        });
+    }
+
+    async function start_zip_keepalive() {
+        if (zip_download_in_progress) {
+            return;
+        }
+
+        zip_download_in_progress = true;
+
+        try {
+            while (true) {
+                console.log("sending keepalive");
+                let response;
+                try {
+                    response = await post_service_worker_message({type: "ZIP_KEEPALIVE_PING"}, 2000);
+                } catch (_) {
+                    console.log("keepalive failed");
+                    break;
+                }
+                const zipDownloadActive = response && response.zipDownloadActive;
+
+                if (zipDownloadActive === false) {
+                    console.log("no active downloads, stopping keepalive");
+                    break;
+                }
+                if (zipDownloadActive === null) {
+                    console.log("keepalive response timeout error");
+                    break;
+                }
+                console.log("keeping keepalive running");
+
+                await new Promise(function (resolve) {
+                    setTimeout(resolve, 10_000);
+                });
+            }
+        } finally {
+            zip_download_in_progress = false;
+        }
     }
 
     function escape_HTML(html_str) {
@@ -654,6 +855,7 @@
         document.getElementById("backdrop").classList.remove("show");
         document.getElementById("download-modal").classList.remove("show");
         document.getElementById("download-links").value = "";
+        document.getElementById("zip-download-status").textContent = "";
     }
 
     // Get the modal
