@@ -10,126 +10,144 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.6/css/all.css">
 
     <style>
+        :root {
+            --bg: #fff;
+            --fg: #333;
+            --muted: #646464;
+            --link: #337ab7;
+            --link-hover: #23527c;
+            --border: #ddd;
+            --stripe: #f9f9f9;
+            --hover: #f5f5f5;
+            --control: #fff;
+            --control-border: #ccc;
+            --control-hover: #e6e6e6;
+            --toggle: #2f3136;
+            --toggle-fg: #f8d47a;
+            color-scheme: light;
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #242322;
+            --fg: #e7e1d8;
+            --muted: #b7aea2;
+            --link: #8db9e8;
+            --link-hover: #b7d4f3;
+            --border: #44413f;
+            --stripe: #2b2a28;
+            --hover: #33312f;
+            --control: #343230;
+            --control-border: #5f5a54;
+            --control-hover: #3c3936;
+            --toggle: #eee8de;
+            --toggle-fg: #3c3834;
+            color-scheme: dark;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            padding-inline: 15px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
             font-size: 16px;
             line-height: 1.42857143;
-            color: #333;
-            background-color: #fff;
+            color: var(--fg);
+            background-color: var(--bg);
+        }
+
+        button,
+        input,
+        textarea {
+            margin: 0;
+            color: inherit;
+            font: inherit;
+        }
+
+        button {
+            padding: 0;
+            border: 0;
+            background: transparent;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
         }
 
         a {
-            color: #337ab7;
+            color: var(--link);
             text-decoration: none;
         }
 
         a:hover,
         a:focus {
-            color: #23527c;
+            color: var(--link-hover);
             text-decoration: underline;
         }
 
-        .container-fluid {
-            margin-right: auto;
-            margin-left: auto;
-            padding-right: 15px;
-            padding-left: 15px;
+        h1,
+        h4 {
+            font-weight: 500;
+            line-height: 1.1;
         }
 
         h1 {
             margin: 20px 0 10px;
             font-size: 36px;
-            font-weight: 500;
-            line-height: 1.1;
         }
 
         h4 {
             margin: 10px 0;
             font-size: 18px;
-            font-weight: 500;
-            line-height: 1.1;
         }
 
         label {
             display: inline-block;
-            max-width: 100%;
             margin-bottom: 5px;
             font-weight: 700;
         }
 
-        .btn {
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            display: inline-block;
-            margin-bottom: 0;
-            padding: 6px 12px;
-            border: 1px solid transparent;
+        .btn,
+        .form-control {
+            border: 1px solid var(--control-border);
             border-radius: 4px;
-            background-image: none;
-            vertical-align: middle;
-            text-align: center;
-            white-space: nowrap;
+            color: var(--fg);
+            background-color: var(--control);
             font-size: 14px;
-            font-weight: 400;
-            line-height: 1.42857143;
-            cursor: pointer;
-            touch-action: manipulation;
-            user-select: none;
         }
 
-        .btn-default,
-        .btn-secondary,
-        .btn:not(.btn-primary):not(.btn-success):not(.btn-info):not(.btn-warning):not(.btn-danger):not(.btn-link) {
-            border-color: #ccc;
-            color: #333;
-            background-color: #fff;
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            vertical-align: middle;
+            white-space: nowrap;
         }
 
-        .btn-default:hover,
-        .btn-secondary:hover,
-        .btn:not(.btn-primary):not(.btn-success):not(.btn-info):not(.btn-warning):not(.btn-danger):not(.btn-link):hover {
-            border-color: #adadad;
-            background-color: #e6e6e6;
-            color: #333;
+        .btn:hover {
+            background-color: var(--control-hover);
             text-decoration: none;
         }
 
-        .btn:focus {
-            outline: 5px auto -webkit-focus-ring-color;
-            outline-offset: -2px;
-        }
-
         .btn-group {
-            position: relative;
-            display: inline-block;
+            display: inline-flex;
             vertical-align: middle;
-        }
-
-        .btn-group > .btn {
-            position: relative;
-            float: left;
         }
 
         .btn-group > .btn + .btn {
             margin-left: -1px;
         }
 
-        .btn-group > .btn:first-child {
-            margin-left: 0;
-        }
-
-        .btn-group > .btn:not(:first-child):not(:last-child) {
-            border-radius: 0;
-        }
-
-        .btn-group > .btn:first-child:not(:last-child) {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-        }
-
-        .btn-group > .btn:last-child:not(:first-child) {
+        .btn-group > .btn:not(:first-child) {
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
+        }
+
+        .btn-group > .btn:not(:last-child) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
         }
 
         .btn-group-sm > .btn {
@@ -139,49 +157,50 @@
             line-height: 1.5;
         }
 
-        .table {
-            width: 100%;
-            max-width: 100%;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            border-spacing: 0;
-            border-collapse: collapse;
+        .file-grid {
+            display: grid;
+            grid-template-columns: minmax(12em, 1fr) max-content 28px repeat(6, max-content) max-content;
+            margin: 20px 0;
         }
 
-        .table > thead > tr > th {
-            border-bottom: 2px solid #ddd;
-            vertical-align: bottom;
+        .file-grid-header,
+        .file-grid-body,
+        .file-row {
+            display: contents;
         }
 
-        .th-sortable {
-            cursor: pointer;
-            user-select: none;
+        .file-cell {
+            min-width: 0;
+            padding: 5px;
+            border-top: 1px solid var(--border);
         }
 
-        .table > thead > tr > th,
-        .table > tbody > tr > td {
-            padding: 8px;
-            border-top: 1px solid #ddd;
-            line-height: 1.42857143;
-            vertical-align: top;
-            text-align: left;
+        .file-grid-header > .file-cell {
+            border-top: 0;
+            border-bottom: 2px solid var(--border);
+            font-weight: 700;
         }
 
-        .table > tbody > tr:first-child > td {
+        .file-row:first-child > .file-cell {
             border-top: 0;
         }
 
-        .table-condensed > thead > tr > th,
-        .table-condensed > tbody > tr > td {
-            padding: 5px;
+        .file-row:nth-child(odd) > .file-cell {
+            background-color: var(--stripe);
         }
 
-        .table-striped > tbody > tr:nth-of-type(odd) {
-            background-color: #f9f9f9;
+        .file-row:hover > .file-cell {
+            background-color: var(--hover);
         }
 
-        .table-hover > tbody > tr:hover {
-            background-color: #f5f5f5;
+        .date-part {
+            padding-inline: 2px;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .date-gutter {
+            padding: 0;
         }
 
         .form-group {
@@ -193,28 +212,15 @@
             width: 100%;
             height: 34px;
             padding: 6px 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            color: #555;
-            background-color: #fff;
-            font-size: 14px;
-            line-height: 1.42857143;
         }
 
-        .checkbox-inline {
-            position: relative;
-            display: inline-block;
+        .checkbox-inline label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
             margin-bottom: 0;
-            padding-left: 20px;
-            vertical-align: middle;
             font-weight: 400;
             cursor: pointer;
-        }
-
-        .checkbox-inline input[type="checkbox"] {
-            position: absolute;
-            margin: 4px 0 0 -20px;
         }
 
         .modal {
@@ -222,76 +228,53 @@
             inset: 0;
             z-index: 1050;
             display: none;
-            overflow: hidden;
-            outline: 0;
-        }
-
-        .modal.fade .modal-dialog {
-            transition: transform .3s ease-out;
-            transform: translate(0, -25%);
-        }
-
-        .modal.show .modal-dialog {
-            transform: translate(0, 0);
         }
 
         .modal-dialog {
             position: relative;
-            width: auto;
+            width: fit-content;
+            max-width: calc(100vw - 30px);
             margin: 30px auto;
-            display: table;
         }
 
         .modal-content {
-            position: relative;
-            border: 1px solid rgba(0, 0, 0, .2);
+            max-width: 100%;
+            border: 1px solid var(--control-border);
             border-radius: 6px;
-            background-color: #fff;
-            background-clip: padding-box;
-            box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
-            outline: 0;
+            background-color: var(--stripe);
+            box-shadow: 0 3px 9px rgba(0, 0, 0, .55);
+        }
+
+        .modal-header,
+        .modal-body,
+        .modal-footer {
+            padding: 15px;
         }
 
         .modal-header {
-            min-height: 16.42857143px;
-            padding: 15px;
-            border-bottom: 1px solid #e5e5e5;
+            border-bottom: 1px solid var(--border);
         }
 
         .modal-title {
             margin: 0;
-            line-height: 1.42857143;
-        }
-
-        .modal-body {
-            position: relative;
-            padding: 15px;
         }
 
         .modal-footer {
-            padding: 15px;
-            border-top: 1px solid #e5e5e5;
+            border-top: 1px solid var(--border);
             text-align: right;
         }
 
         .close {
             float: right;
-            border: 0;
-            background: transparent;
-            padding: 0;
-            color: #000;
-            text-shadow: 0 1px 0 #fff;
             font-size: 21px;
             font-weight: 700;
             line-height: 1;
             opacity: .2;
-            cursor: pointer;
         }
 
         .close:hover,
         .close:focus {
             opacity: .5;
-            text-decoration: none;
         }
 
         .modal-backdrop {
@@ -299,18 +282,11 @@
             inset: 0;
             z-index: 1040;
             background-color: #000;
-        }
-
-        .modal-backdrop.fade {
-            opacity: 0;
-        }
-
-        .modal-backdrop.show {
             opacity: .5;
         }
 
         .fileicon {
-            color: #646464;
+            color: var(--muted);
         }
 
         .td-file-name {
@@ -319,46 +295,138 @@
             text-overflow: ellipsis;
         }
 
-        .td-file-size {
-            width: 130px;
+        .td-file-date-header,
+        .td-file-date-empty {
+            grid-column: span 6;
+            white-space: nowrap;
         }
 
-        .td-file-date {
-            width: 270px;
+        .td-file-size,
+        .date-day,
+        .date-year,
+        .date-time {
+            text-align: right;
+        }
+
+        .td-file-action,
+        .td-file-action-header {
+            padding-left: 10px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .zip-row-button {
+            width: 22px;
+            height: 22px;
+            padding: 0;
+            border-radius: 3px;
+            font-size: 12px;
+            line-height: 20px;
         }
 
         .dl-textarea {
+            width: 640px;
             height: auto;
-            min-width: 569px;
+            min-width: min(520px, calc(100vw - 60px));
+            max-width: min(900px, calc(100vw - 60px));
             white-space: pre;
             overflow: auto;
-            resize: vertical;
+            resize: both;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 1060;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border-radius: 50%;
+            color: var(--toggle-fg);
+            background-color: var(--toggle);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, .35);
+            font-size: 18px;
+            line-height: 44px;
+        }
+
+        .theme-toggle:hover,
+        .theme-toggle:focus {
+            color: var(--toggle-fg);
+            background-color: var(--toggle);
+        }
+
+        .status-toast {
+            position: fixed;
+            left: 50%;
+            bottom: 18px;
+            z-index: 1070;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: max-content;
+            max-width: min(480px, calc(100vw - 30px));
+            padding: 10px 12px;
+            border: 1px solid var(--control-border);
+            border-radius: 6px;
+            background-color: var(--control);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .35);
+            line-height: 1.35;
+            transform: translateX(-50%);
+        }
+
+        .status-toast[hidden] {
+            display: none;
+        }
+
+        .status-toast.is-error {
+            border-color: #b94a48;
+        }
+
+        .status-toast.is-success {
+            border-color: #3c763d;
+        }
+
+        .status-toast-icon {
+            flex: 0 0 auto;
+            color: var(--muted);
+        }
+
+        .status-toast-message {
+            min-width: 0;
+            overflow-wrap: break-word;
         }
     </style>
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("pretty-file-index-theme");
+            if (savedTheme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+            }
+        })();
+    </script>
 </head>
 
 <body>
-<div id="filelist-container" class="container-fluid">
+<div id="filelist-container">
     <h1 id="headerline">Index of </h1>
     <button type="button" class="btn" onclick="openModal()">
         <i class="fas fa-download"></i>
         &nbsp;Download All
     </button>
-    <table class="table table-condensed table-striped table-hover">
-        <thead>
-        <tr>
-            <th class="td-file-name">File Name</th>
-            <th class="td-file-size">File Size</th>
-            <th class="td-file-date">Date</th>
-        </tr>
-        </thead>
-        <tbody id="filelist-body">
-
-        </tbody>
-    </table>
+    <div id="filelist-grid" class="file-grid" role="table">
+        <div class="file-grid-header" role="row">
+            <div class="file-cell td-file-name" role="columnheader">File Name</div>
+            <div class="file-cell td-file-size" role="columnheader">File Size</div>
+            <div class="file-cell date-gutter" role="presentation"></div>
+            <div class="file-cell td-file-date-header" role="columnheader">Date</div>
+            <div class="file-cell td-file-action-header" role="columnheader"></div>
+        </div>
+        <div id="filelist-body" class="file-grid-body" role="rowgroup"></div>
+    </div>
 </div>
 
-<div class="modal fade" id="download-modal" aria-labelledby="download-modal-label" aria-modal="true"
+<div class="modal" id="download-modal" aria-labelledby="download-modal-label" aria-modal="true"
      role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -371,37 +439,43 @@
                     <label><input type="checkbox" id="include-subdirectories">Include subdirectories</label>
                 </div>
                 <div class="btn-group btn-group-sm" style="float: right;">
-                    <button type="button" id="copy-downloads-button" class="btn btn-default"><i
+                    <button type="button" id="download-zip-button" class="btn"><i
+                            class="far fa-file-archive"></i>&nbsp;Download ZIP
+                    </button>
+                    <button type="button" id="copy-downloads-button" class="btn"><i
                             class="far fa-clipboard"></i>&nbsp;Copy To Clipboard
                     </button>
                 </div>
-
                 <div class="download-links-container form-group">
-                    <textarea id="download-links" class="form-control dl-textarea" rows="15" readonly></textarea>
+                    <label for="download-links"></label><textarea id="download-links" class="form-control dl-textarea" rows="15" readonly></textarea>
                 </div>
 
                 <div class="download-links-template-container form-group">
                     <label for="download-links-template">Template</label>
                     <div class="btn-group btn-group-sm" style="float: right;">
-                        <button type="button" class="btn btn-default" onclick="changeTemplate('raw')">raw</button>
-                        <button type="button" class="btn btn-default" onclick="changeTemplate('curl')">cURL</button>
-                        <button type="button" class="btn btn-default" onclick="changeTemplate('wget')">wget</button>
+                        <button type="button" class="btn" onclick="changeTemplate('raw')">raw</button>
+                        <button type="button" class="btn" onclick="changeTemplate('curl')">cURL</button>
+                        <button type="button" class="btn" onclick="changeTemplate('wget')">wget</button>
                     </div>
                     <input type="text" id="download-links-template" class="form-control">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal();">Close</button>
+                <button type="button" class="btn" onclick="closeModal();">Close</button>
             </div>
         </div>
     </div>
 </div>
-<div class="modal-backdrop fade" id="backdrop" style="display: none;"></div>
+<div class="modal-backdrop" id="backdrop" style="display: none;"></div>
+<div id="status-toast" class="status-toast" role="status" aria-live="polite" hidden>
+    <i class="status-toast-icon fas fa-info-circle" aria-hidden="true"></i>
+    <span class="status-toast-message"></span>
+</div>
+<button type="button" class="btn theme-toggle" id="theme-toggle" aria-label="Switch to dark mode" title="Switch to dark mode">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+</button>
 
 <script>
-    const pageTitleTemplate = "{0} - {1}";
-    const headlineTemplate = "Index of {0}";
-
     const iconObject = {
         "far fa-file-archive": ["rar", "zip", "7z", "gz", "bz2", "tgz", "tbz2", "tar"],
         "far fa-file-video": ["mkv", "mp4", "webm", "avi", "m4v", "h264", "mpg", "m2v", "mpeg", "ts", "m2ts", "vob", "mov"],
@@ -415,7 +489,7 @@
     const folderIcon = "fas fa-folder";
     const defaultIcon = "far fa-file";
 
-    const iconString = "<span class='fileicon {0}'></span>";
+    const themeStorageKey = "pretty-file-index-theme";
 
     const dlTemplates = {
         raw: "{0}",
@@ -423,49 +497,64 @@
         wget: "wget '{0}'"
     };
 
-    let timer = 0;
     document.getElementById("download-links-template").addEventListener("input", function () {
-        if (timer > 0) {
-            clearTimeout(timer);
-            timer = 0;
-        }
-        timer = setTimeout(fillDownloadLinks, 150);
+        fillDownloadLinks();
     });
 
     document.getElementById("include-subdirectories").addEventListener("change", function () {
         fillDownloadLinks();
     });
 
-    document.getElementById("copy-downloads-button").addEventListener("click", function () {
-        document.getElementById("download-links").select();
-        document.execCommand("copy");
+    document.getElementById("copy-downloads-button").addEventListener("click", async () => {
+        const textarea = document.getElementById("download-links");
+        await navigator.clipboard.writeText(textarea.value);
     });
 
-    let current_page_data = {};
+    document.getElementById("download-zip-button").addEventListener("click", function () {
+        startZipDownload();
+    });
+
+    document.getElementById("filelist-body").addEventListener("click", function (event) {
+        const zipButton = event.target.closest("[data-zip-url]");
+        if (!zipButton) {
+            return;
+        }
+
+        const directoryUrl = zipButton.getAttribute("data-zip-url");
+
+        startZipDownload({
+            button: zipButton,
+            collectFiles: async function () {
+                const page_data = await fetch_page_json(directoryUrl);
+                return collect_download_entries(page_data, directoryUrl, true);
+            },
+            filenameBase: zipButton.getAttribute("data-zip-filename")
+        });
+    });
+
+    let current_page_data = [];
+    let zip_download_in_progress = false;
+    const zip_download_warning_message = "A ZIP download is still running. Keep this tab open until it finishes.";
+    let status_hide_timer = 0;
     const filenameCollator = new Intl.Collator(undefined, {
         numeric: true,
         sensitivity: "base"
     });
     let filenameSortDirection = "asc";
+    let download_links_fill_request = 0;
 
     function update() {
         const headline = document.getElementById("headerline");
-        headline.innerHTML = headlineTemplate.format(decodeURIComponent(window.location.pathname));
-        document.title = pageTitleTemplate.format(decodeURIComponent(window.location.pathname), decodeURIComponent(window.location.host));
-        fetch("/list" + window.location.pathname)
-            .then(async function (resp) {
-                document.getElementsByTagName("table")[0].style.display = 'table';
-
-                if (resp.status !== 200) {
-                    throw resp.status + " " + resp.statusText;
-                }
-
-                const text = await resp.text();
-                current_page_data = text.length === 0 ? [] : JSON.parse(text);
+        headline.textContent = "Index of " + decodeURIComponent(window.location.pathname);
+        document.title = decodeURIComponent(window.location.pathname) + " - " + decodeURIComponent(window.location.host);
+        fetch_page_json("/list" + window.location.pathname)
+            .then(function (page_data) {
+                document.getElementById("filelist-grid").style.display = 'grid';
+                current_page_data = page_data;
                 renderCurrentPageData();
             })
             .catch(function (err) {
-                document.getElementsByTagName("table")[0].style.display = 'none';
+                document.getElementById("filelist-grid").style.display = 'none';
                 headline.innerHTML = "<h1 style=\"color: red\"><a href=\".\" onclick=\"history.back(); return false;\" style=\"text-decoration: none; color: gray; padding-right: 15px\"><i class=\"fas fa-chevron-left\"></i></a>" + err + "</h1>";
             });
     }
@@ -475,19 +564,89 @@
         update();
     }
 
+    function warn_before_leaving_during_zip_download(event) {
+        if (!zip_download_in_progress) {
+            return;
+        }
+
+        event.preventDefault();
+        event.returnValue = zip_download_warning_message;
+        return zip_download_warning_message;
+    }
+
+    function should_warn_about_anchor_navigation(link, event) {
+        if (!zip_download_in_progress || event.defaultPrevented || event.button !== 0) {
+            return false;
+        }
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+            return false;
+        }
+        if (link.hasAttribute("download")) {
+            return false;
+        }
+        if (link.target && link.target.toLowerCase() !== "_self") {
+            return false;
+        }
+
+        const url = new URL(link.href, window.location.href);
+        return url.href !== window.location.href && !url.pathname.startsWith("/__zip_download__/");
+    }
+
+    window.addEventListener("beforeunload", warn_before_leaving_during_zip_download);
+
+    document.addEventListener("click", function (event) {
+        const link = event.target.closest("a[href]");
+        if (!link || !should_warn_about_anchor_navigation(link, event)) {
+            return;
+        }
+
+        if (!window.confirm(zip_download_warning_message)) {
+            event.preventDefault();
+        }
+    });
+
     window.onpopstate = function (_) {
         update();
     };
 
     document.addEventListener("DOMContentLoaded", function () {
-        const fileNameHeader = document.querySelector("th.td-file-name");
-        if (fileNameHeader) {
-            fileNameHeader.classList.add("th-sortable");
-            fileNameHeader.addEventListener("click", toggleFilenameSortDirection);
-        }
+        const themeToggle = document.getElementById("theme-toggle");
+        themeToggle.addEventListener("click", toggleTheme);
+        updateThemeToggle();
+
+        const fileNameHeader = document.querySelector(".file-grid-header .td-file-name");
+        fileNameHeader.classList.add("th-sortable");
+        fileNameHeader.addEventListener("click", toggleFilenameSortDirection);
         updateFilenameSortHeader();
         update();
     }, false);
+
+    function getCurrentTheme() {
+        return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    }
+
+    function setTheme(theme) {
+        if (theme === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+        } else {
+            document.documentElement.removeAttribute("data-theme");
+        }
+
+        localStorage.setItem(themeStorageKey, theme);
+        updateThemeToggle();
+    }
+
+    function toggleTheme() {
+        setTheme(getCurrentTheme() === "dark" ? "light" : "dark");
+    }
+
+    function updateThemeToggle() {
+        const themeToggle = document.getElementById("theme-toggle");
+        const isDark = getCurrentTheme() === "dark";
+        themeToggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+        themeToggle.setAttribute("title", isDark ? "Switch to light mode" : "Switch to dark mode");
+        themeToggle.innerHTML = "<i class=\"fas " + (isDark ? "fa-sun" : "fa-moon") + "\" aria-hidden=\"true\"></i>";
+    }
 
     function getSortedCurrentPageData() {
         const sorted = current_page_data.slice();
@@ -508,25 +667,31 @@
 
     function renderCurrentPageData() {
         const body = document.getElementById("filelist-body");
+        const currentHref = escape_HTML(window.location.origin + window.location.pathname.replace(/\/$/, ""));
+        const currentListUrl = escape_HTML("/list" + window.location.pathname);
+        const currentFilenameBase = decodeURIComponent(window.location.pathname).replace(/\/+$/, "").split("/").filter(Boolean).pop() || "download";
+        const currentFolderZipButton = "<button type=\"button\" class=\"btn zip-row-button\" data-zip-url=\"" + currentListUrl + "\" data-zip-filename=\"" + escape_HTML(currentFilenameBase) + "\" title=\"Download current directory as ZIP\" aria-label=\"Download current directory as ZIP\"><i class=\"far fa-file-archive\" aria-hidden=\"true\"></i></button>";
         body.innerHTML = "";
-        body.insertAdjacentHTML("beforeend", "<tr><td><a href='../' onclick=\"on_click_link(this); return false;\">../</a></td><td></td><td></td></tr>");
+        body.insertAdjacentHTML("beforeend", "<div class='file-row' role='row'><div class='file-cell td-file-name' role='cell'><a href='../' onclick=\"on_click_link(this); return false;\">../</a></div><div class='file-cell td-file-size' role='cell'></div><div class='file-cell date-gutter' role='presentation'></div><div class='file-cell td-file-date-empty' role='cell'></div><div class='file-cell td-file-action' role='cell'>" + currentFolderZipButton + "</div></div>");
 
         const entries = getSortedCurrentPageData();
         for (let entry of entries) {
             const icon = getIconString(entry);
             const isDirectory = entry.type === "directory";
-            const displayName = isDirectory ? entry.name + "/" : entry.name;
             const onclick_str = isDirectory ? " onclick=\"on_click_link(this); return false;\"" : "";
+            const href = currentHref + "/" + entry.encodedName + (isDirectory ? "/" : "");
+            const zipButton = isDirectory
+                ? "<button type=\"button\" class=\"btn zip-row-button\" data-zip-url=\"" + currentListUrl + entry.encodedName + "/\" data-zip-filename=\"" + entry.escapedName + "\" title=\"Download directory as ZIP\" aria-label=\"Download " + entry.escapedDisplayName + " as ZIP\"><i class=\"far fa-file-archive\" aria-hidden=\"true\"></i></button>"
+                : "";
 
-            body.insertAdjacentHTML("beforeend", "<tr><td class='td-file-name'><a href=\"{0}/{1}\"{6}>{2} {3}</a></td><td class='td-file-size'>{4}</td><td class='td-file-date'>{5}</td></tr>".format(
-                decodeURIComponent(window.location.href.replace(/\/$/, "")),
-                encodeURIComponent(displayName).replace('%2F', '/'),
-                iconString.format(icon),
-                escape_HTML(displayName),
-                entry.size ? formatBytes(entry.size, 2) : '-',
-                entry.mtime,
-                onclick_str
-            ));
+            body.insertAdjacentHTML("beforeend",
+                "<div class='file-row' role='row'>" +
+                "<div class='file-cell td-file-name' role='cell'><a href=\"" + href + "\"" + onclick_str + "><span class='fileicon " + icon + "'></span> " + entry.escapedDisplayName + "</a></div>" +
+                "<div class='file-cell td-file-size' role='cell'>" + (isDirectory ? '-' : formatBytes(entry.size)) + "</div>" +
+                "<div class='file-cell date-gutter' role='presentation'></div>" +
+                formatDateCell(entry.mtime) +
+                "<div class='file-cell td-file-action' role='cell'>" + zipButton + "</div>" +
+                "</div>");
         }
     }
 
@@ -537,10 +702,7 @@
     }
 
     function updateFilenameSortHeader() {
-        const fileNameHeader = document.querySelector("th.td-file-name");
-        if (!fileNameHeader) {
-            return;
-        }
+        const fileNameHeader = document.querySelector(".file-grid-header .td-file-name");
         fileNameHeader.textContent = "File Name " + (filenameSortDirection === "asc" ? "▲" : "▼");
     }
 
@@ -557,15 +719,24 @@
         return defaultIcon;
     }
 
-    function formatBytes(bytes, decimals) {
+    function formatDateCell(mtime) {
+        const parts = mtime.match(/^([A-Za-z]{3},) (\d{2}) ([A-Za-z]{3}) (\d{4}) (\d{2}:\d{2}:\d{2}) ([A-Z]+)$/);
+        return "<div class=\"file-cell date-part date-weekday\" role=\"cell\">" + parts[1] + "</div>" +
+            "<div class=\"file-cell date-part date-day\" role=\"cell\">" + parts[2] + "</div>" +
+            "<div class=\"file-cell date-part date-month\" role=\"cell\">" + parts[3] + "</div>" +
+            "<div class=\"file-cell date-part date-year\" role=\"cell\">" + parts[4] + "</div>" +
+            "<div class=\"file-cell date-part date-time\" role=\"cell\">" + parts[5] + "</div>" +
+            "<div class=\"file-cell date-part date-zone\" role=\"cell\">" + parts[6] + "</div>";
+    }
+
+    function formatBytes(bytes) {
         if (bytes === 0) {
             return '0 Bytes';
         }
         const k = 1024,
-            dm = decimals || 2,
             sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'],
             i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
     function changeTemplate(template) {
@@ -573,25 +744,38 @@
         fillDownloadLinks();
     }
 
-    function collect_dl_links(page_data, url_path, outputTextArea, getRecursive = false) {
-        const template = document.getElementById("download-links-template").value;
+    async function collect_download_entries(page_data, url_path, getRecursive, zipPrefix = "") {
+        const entries = [];
+        const subdirectory_fetches = [];
+        const file_path = url_path.substring(5);
+
         for (let entry of page_data) {
-            let entry_name = encodeURIComponent(entry.name.replace("/", ""));
             if (entry.type === "directory") {
                 if (getRecursive) {
-                    let recursion_url = url_path + entry_name + "/";
-                    fetch_page_json(recursion_url).then(async function (page_data) {
-                        collect_dl_links(page_data, recursion_url, outputTextArea, true);
-                    });
+                    const recursion_url = url_path + entry.encodedName + "/";
+                    subdirectory_fetches.push(fetch_page_json(recursion_url).then(function (recursion_page_data) {
+                        return collect_download_entries(recursion_page_data, recursion_url, true, zipPrefix + entry.name + "/");
+                    }));
                 }
                 continue;
             }
-            // the substring(5) drops the "/list/" prefix to generate working download links
-            let file_link = window.location.origin + url_path.substring(5) + entry_name;
-            // first template arg is just the download link, second arg is the path and filename relative to the base dir
-            outputTextArea.value += template.format(file_link, url_path.substring(5).replace(window.location.pathname, "") + entry_name);
-            outputTextArea.value += "\n";
+
+            const file_link = window.location.origin + file_path + entry.encodedName;
+            entries.push({
+                url: file_link,
+                downloadPath: file_path.replace(window.location.pathname, "") + entry.encodedName,
+                path: zipPrefix + entry.name,
+                mtime: entry.mtime,
+                size: entry.size
+            });
         }
+
+        const subdirectory_entries = await Promise.all(subdirectory_fetches);
+        for (let entry_list of subdirectory_entries) {
+            entries.push(...entry_list);
+        }
+
+        return entries;
     }
 
     async function fetch_page_json(url) {
@@ -603,65 +787,233 @@
         if (t.length === 0) {
             return [];
         }
-        return JSON.parse(t);
+        const page_data = JSON.parse(t);
+        for (let entry of page_data) {
+            entry.name = entry.name.replace(/\/+$/, "");
+            entry.encodedName = encodeURIComponent(entry.name);
+            entry.escapedName = escape_HTML(entry.name);
+            entry.escapedDisplayName = escape_HTML(entry.type === "directory" ? entry.name + "/" : entry.name);
+        }
+        return page_data;
     }
 
-    function fillDownloadLinks() {
+    async function fillDownloadLinks() {
+        const fill_request = ++download_links_fill_request;
         const textField = document.getElementById("download-links");
         const includeSub = document.getElementById("include-subdirectories");
+        const template = document.getElementById("download-links-template").value;
+        const entries = await collect_download_entries(current_page_data, "/list" + window.location.pathname, includeSub.checked);
+        if (fill_request !== download_links_fill_request) {
+            return;
+        }
+
         textField.value = "";
-        collect_dl_links(current_page_data, "/list" + window.location.pathname, textField, includeSub.checked);
+        for (let entry of entries) {
+            // first template arg is just the download link, second arg is the path and filename relative to the base dir
+            textField.value += formatDownloadTemplate(template, entry.url, entry.downloadPath);
+            textField.value += "\n";
+        }
+    }
+
+    function formatDownloadTemplate(template, url, downloadPath) {
+        return template.replace(/\{([01])}/g, function (_, index) {
+            return index === "0" ? url : downloadPath;
+        });
+    }
+
+    async function startZipDownload(options = {}) {
+        const zipButton = options.button || document.getElementById("download-zip-button");
+        const includeSub = document.getElementById("include-subdirectories");
+
+        zipButton.disabled = true;
+
+        try {
+            if (!("serviceWorker" in navigator)) {
+                showStatus("Service workers are not available in this browser.", "error");
+                return;
+            }
+            if (!window.isSecureContext) {
+                showStatus("Service workers require HTTPS.", "error");
+                return;
+            }
+
+            showStatus("Collecting files...");
+            const files = options.collectFiles
+                ? await options.collectFiles()
+                : await collect_download_entries(current_page_data, "/list" + window.location.pathname, includeSub.checked);
+            if (files.length === 0) {
+                showStatus("No files to zip.", "error", 5000);
+                return;
+            }
+
+            showStatus("Preparing ZIP...");
+            await navigator.serviceWorker.register("/sw.js", {scope: "/"});
+            const registration = await navigator.serviceWorker.ready;
+
+            if (!navigator.serviceWorker.controller) {
+                const controllerChanged = new Promise(function (resolve) {
+                    navigator.serviceWorker.addEventListener("controllerchange", resolve, {once: true});
+                });
+                registration.active.postMessage({type: "CLAIM_CLIENTS"});
+                await controllerChanged;
+            }
+
+            const path = decodeURIComponent(window.location.pathname).replace(/\/+$/, "");
+            const lastPart = options.filenameBase || path.split("/").filter(Boolean).pop() || "download";
+            const filename = lastPart.replace(/[\\/:*?"<>|]+/g, "_") + ".zip";
+            const token = crypto.randomUUID();
+
+            const createJobResponse = await post_service_worker_message({
+                type: "ZIP_CREATE_JOB",
+                token: token,
+                filename: filename,
+                files: files
+            }, 2000);
+            if (createJobResponse === null) {
+                console.error("Timed out waiting for ZIP_CREATE_JOB response.");
+            }
+            showStatus("Starting download...");
+            const downloadLink = document.createElement("a");
+            downloadLink.href = "/__zip_download__/" + encodeURIComponent(token) + "/" + encodeURIComponent(filename);
+            downloadLink.download = filename;
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            downloadLink.remove();
+
+            start_zip_keepalive().then(() => {});
+            showStatus("Downloading ZIP. Keep this tab open.");
+        } catch (err) {
+            console.error(err);
+            showStatus("ZIP download failed: " + err, "error");
+        } finally {
+            zipButton.disabled = false;
+        }
+    }
+
+    function showStatus(message, type, hideAfterMs) {
+        const toast = document.getElementById("status-toast");
+        const icon = toast.querySelector(".status-toast-icon");
+        toast.querySelector(".status-toast-message").textContent = message;
+        toast.className = "status-toast" + (type ? " is-" + type : "");
+        icon.className = "status-toast-icon " + getStatusIconClass(type);
+        toast.hidden = false;
+
+        clearTimeout(status_hide_timer);
+        status_hide_timer = 0;
+
+        if (hideAfterMs) {
+            status_hide_timer = setTimeout(hideStatus, hideAfterMs);
+        }
+    }
+
+    function hideStatus() {
+        document.getElementById("status-toast").hidden = true;
+        status_hide_timer = 0;
+    }
+
+    function getStatusIconClass(type) {
+        if (type === "error") {
+            return "fas fa-exclamation-circle";
+        }
+        if (type === "success") {
+            return "fas fa-check-circle";
+        }
+        return "fas fa-info-circle";
+    }
+
+    function post_service_worker_message(message, timeoutMs) {
+        return new Promise(function (resolve) {
+            const channel = new MessageChannel();
+
+            channel.port1.onmessage = function (event) {
+                channel.port1.close();
+                resolve(event.data);
+            };
+
+            setTimeout(function () {
+                channel.port1.close();
+                resolve(null);
+            }, timeoutMs);
+
+            navigator.serviceWorker.controller.postMessage(message, [channel.port2]);
+        });
+    }
+
+    async function start_zip_keepalive() {
+        if (zip_download_in_progress) {
+            return;
+        }
+
+        zip_download_in_progress = true;
+        let confirmedDone = false;
+
+        try {
+            while (true) {
+                console.log("sending keepalive");
+                let response;
+                try {
+                    response = await post_service_worker_message({type: "ZIP_KEEPALIVE_PING"}, 2000);
+                } catch (_) {
+                    console.log("keepalive failed");
+                    break;
+                }
+                if (response === null) {
+                    console.log("keepalive response timeout error");
+                    break;
+                }
+                if (response.zipDownloadActive === false) {
+                    console.log("no active downloads, stopping keepalive");
+                    confirmedDone = true;
+                    break;
+                }
+                console.log("keeping keepalive running");
+
+                await new Promise(function (resolve) {
+                    setTimeout(resolve, 3000);
+                });
+            }
+        } finally {
+            zip_download_in_progress = false;
+            if (confirmedDone) {
+                showStatus("ZIP download finished.", "success", 5000);
+            }
+        }
     }
 
     function escape_HTML(html_str) {
-        'use strict';
+        const chars_repl = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;'
+        };
 
         return html_str.replace(/[&<>"]/g, function (tag) {
-            const chars_repl = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-
-            return chars_repl[tag] || tag;
+            return chars_repl[tag];
         });
     }
-
-    String.prototype.format = function () {
-        const args = arguments;
-        return this.replace(/{(\d+)}/g, function (match, number) {
-            return typeof args[number] != 'undefined'
-                ? args[number]
-                : match
-                ;
-        });
-    };
 
     //modal stuff (https://dev.to/ara225/how-to-use-bootstrap-modals-without-jquery-3475)
     function openModal() {
         document.getElementById("backdrop").style.display = "block";
         document.getElementById("download-modal").style.display = "block";
-        document.getElementById("backdrop").classList.add("show");
-        document.getElementById("download-modal").classList.add("show");
         changeTemplate("raw");
     }
 
     function closeModal() {
+        download_links_fill_request++;
         document.getElementById("backdrop").style.display = "none";
         document.getElementById("download-modal").style.display = "none";
-        document.getElementById("backdrop").classList.remove("show");
-        document.getElementById("download-modal").classList.remove("show");
         document.getElementById("download-links").value = "";
     }
 
     // Get the modal
     let modal = document.getElementById('download-modal');
 
-    // When the user clicks anywhere outside of the modal, close it
+    // When the user clicks anywhere outside the modal, close it
     window.onclick = function (event) {
-        if (event.target == modal) {
+        if (event.target === modal) {
             closeModal();
         }
     };
